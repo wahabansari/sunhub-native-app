@@ -2,140 +2,79 @@
 
 ## Current state
 
-The foundation has 18 test suites and 79 passing tests at the time of writing:
-
-- 13 unit suites.
-- 2 component suites.
-- 3 integration suites.
-
-No E2E suite exists. No device, emulator, simulator, or Expo dev server was
-started during the foundation work.
-
-The web reference at `../sunhub3.0` has no visible test script or test suite in
-its `package.json`; this mobile foundation does not inherit a testing setup from
-it.
+The foundation currently has no test files because it contains infrastructure
+but no product pages or feature logic. New pages and features must include
+Vitest tests before they are pushed.
 
 ## Test types
 
-Use these terms consistently:
-
-- **Unit test** — pure functions, parsers, reducers, mappers, and utilities. No
-  React renderer and no network.
-- **Component test** — a React Native component or context provider rendered with
-  React Native Testing Library (RNTL). Native modules are mocked.
+- **Unit test** — pure functions, parsers, reducers, mappers, and utilities.
+- **Component test** — a React Native component or context provider rendered
+  with React Native Testing Library (RNTL).
 - **Integration test** — several real modules wired together with mocked
-  boundaries. For this app: auth service + API client + storage, or API client +
-  fake `fetch`.
-- **E2E test** — a real build running on a device or simulator against a real or
-  controlled backend. Not configured here.
+  boundaries, such as an auth service with a fake API client and storage.
+- **E2E test** — a real build running on a device or simulator. Not configured.
 
-Do not label tests as "A/B" or use marketing-style test names.
+RNTL 14 uses React 19's async rendering model. Always await `render`,
+`renderHook`, `fireEvent`, and `act`. The installed package documentation in
+`node_modules/@testing-library/react-native/docs/` is authoritative for RNTL
+APIs and conventions.
 
 ## Commands
 
 ```bash
-npm test                      # run all tests
-npm test -- --runInBand       # serial, used by verify
-npm run test:watch            # watch mode
-npm run test:coverage         # coverage report in coverage/
+npm test
+npm run test:watch
+npm run test:coverage
+npm run test:guard
 npm run typecheck
 npm run lint
 npm run format:check
-npm run verify                # typecheck + lint + format + tests
+npm run verify
 ```
 
-`npm run verify` is the required pre-completion gate. Report actual results; do
-not claim a check passed without running it.
+`npm run test:guard` scans `tests/` for `*.test.ts`, `*.test.tsx`,
+`*.spec.ts`, and `*.spec.tsx`. It prints a warning and exits successfully when
+none exist, so the empty foundation remains verifiable without silently hiding
+the missing-test policy. When test files exist, `npm run verify` runs them with
+Vitest.
 
 ## Configuration
 
-- `jest.config.js` uses the `jest-expo` preset with Jest 30.
-- `setupFiles` loads `react-native-css-interop/test/setup` so NativeWind and
-  Reanimated are mocked before the environment.
-- `tests/setup.ts` is loaded after the environment. It globally mocks
-  `expo-secure-store` and exposes `__reset`, `__set`, and `__get` helpers.
-- `.css` imports are mapped to `tests/styleMock.ts`; tests never parse real CSS.
-- Do not add `react-native-css-interop/test/setupAfterEnv`; it depends on a Jest
-  API that Jest 30 removed.
-- `testMatch` is limited to `tests/**/*.test.{ts,tsx}`.
-- `clearMocks` is enabled.
-- The `@/*` alias maps to `src/*`.
-- Coverage collects from `src/**/*.{ts,tsx}`, excluding `src/types` and
-  `src/index.ts` barrels.
-- Tests use `test-renderer` 1.3.x, matching React 19.3.
+`vitest.config.js`:
 
-Jest 30 is required by Expo SDK 58. Do not downgrade to Jest 29.
+- enables global Vitest APIs;
+- uses the Node environment;
+- includes only `tests/**/*.{test,spec}.{ts,tsx}`;
+- disables CSS processing (`test.css: false`);
+- maps `@/*` to `src/*`; and
+- allows an empty suite with `test.passWithNoTests: true`.
 
-## RNTL 14 is asynchronous
-
-RNTL 14 uses React 19's async rendering model. Every render and event is async:
-
-```ts
-await render(<Component />);
-await fireEvent.press(screen.getByText('Submit'));
-const { result } = await renderHook(() => useAuth());
-```
-
-Common mistakes:
-
-- Calling `render()` without `await`. `screen` is not populated yet and throws
-  `` `render` function has not been called ``.
-- Calling `fireEvent.press()` without `await`, so state updates are not flushed.
-- Using `screen` after a synchronous `render` and assuming the tree is ready.
-
-Read the installed docs at
-`node_modules/@testing-library/react-native/docs/` before changing test patterns.
-The migration guide for v14 is especially relevant.
-
-## What is covered
-
-| Area                      | Kind        | Focus                                        |
-| ------------------------- | ----------- | -------------------------------------------- |
-| Env parsing               | Unit        | defaults, normalization, invalid values      |
-| Guards and validation     | Unit        | unknown input handling                       |
-| Formatting and pagination | Unit        | pure helpers                                 |
-| Pricing and compliance    | Unit        | ported business helpers                      |
-| Roles                     | Unit        | role normalization and checks                |
-| Logger                    | Unit        | level filtering and redaction                |
-| Errors                    | Unit        | codes and safe messages                      |
-| Auth reducer              | Unit        | all state transitions                        |
-| Auth mappers              | Unit        | login/profile payload validation             |
-| Auth provider             | Component   | restore, sign-in, sign-out, error clearing   |
-| Error boundary            | Component   | fallback rendering and error reporting       |
-| API client                | Integration | fetch, timeout, abort, error mapping         |
-| Session storage           | Integration | SecureStore read/write/clear and recovery    |
-| Auth service              | Integration | login, restore, logout, storage coordination |
+The Node environment is intentional. RNTL renders through its JavaScript Test
+Renderer rather than a browser DOM, so component tests do not need `jsdom`, a
+device, or a simulator. Mock native modules at the boundary when a test needs
+them. The old CSS interop/Reanimated setup is not loaded by Vitest.
 
 ## Test boundaries
 
-- Mock `expo-secure-store`, not the app's `sessionStorage`. This exercises the
-  real storage adapter.
-- Mock `fetch` through the `fetchImpl` dependency of the API client. Do not
-  monkey-patch global state for integration tests when a dependency can be
-  injected.
-- Use `tests/fixtures/auth.ts` for auth service and provider doubles.
-- Keep auth provider tests on a fake `AuthService`; do not reach into module
-  singletons.
-- Assert user-visible outcomes and public contracts. Avoid snapshot tests of
-  large trees.
-- Do not assert that the token is present in context. It must not be there.
+- Mock `expo-secure-store`, not the app's `sessionStorage`, so the real storage
+  adapter remains covered.
+- Inject a fake `fetch` into the API client instead of relying on global state.
+- Assert user-visible outcomes and public contracts; avoid large snapshots.
+- Never assert that an access token is present in context. It must not be there.
 
 ## Adding tests
 
 1. Put pure logic tests in `tests/unit/`.
 2. Put RNTL tests in `tests/component/`.
 3. Put multi-module tests with mocked boundaries in `tests/integration/`.
-4. Add fixtures under `tests/fixtures/` when a double is shared.
-5. Cover both success and failure paths for auth and API changes.
-6. Run `npm run verify` and report the exact pass/fail counts.
+4. Add shared doubles under `tests/fixtures/` only when needed.
+5. Cover success and failure paths for behavior changes.
+6. Run `npm run verify` and report the actual results.
 
 ## What is not covered
 
-- Real network calls to the backend.
-- Real SecureStore behavior on iOS or Android.
-- Native build, app launch, deep links, or push notifications.
-- Navigation; no navigation library exists yet.
-- E2E flows; no E2E harness exists yet.
-
-Add E2E coverage only when there are real screens and a stable backend target.
-Do not start an emulator or device as part of routine unit or component work.
+Real network calls, real SecureStore behavior, native builds, app launch, deep
+links, push notifications, navigation, and E2E flows are out of scope for the
+current foundation. Do not start an emulator, simulator, device, or Expo dev
+server for routine unit or component work.

@@ -1,4 +1,4 @@
-import { isAppError } from './AppError';
+import { isAppError } from './app-error';
 
 export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
 

@@ -2,7 +2,7 @@ import { createContext } from 'react';
 
 import type { SignInCredentials } from '@/types/auth';
 
-import type { AuthState } from './authReducer';
+import type { AuthState } from './auth-reducer';
 
 export interface AuthContextValue {
   state: AuthState;

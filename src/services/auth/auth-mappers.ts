@@ -1,5 +1,5 @@
 import { ACTIVE_PROFILE_STATUS } from '@/constants/app';
-import { AppError } from '@/errors/AppError';
+import { AppError } from '@/errors/app-error';
 import type { AuthProfile, AuthUser, LoginResult } from '@/types/auth';
 import { asNonEmptyString, asStringArray, isRecord } from '@/utils/guards';
 

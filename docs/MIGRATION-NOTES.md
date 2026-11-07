@@ -24,7 +24,7 @@ Target stack:
 - Context API plus `useReducer`.
 - Fetch plus `AbortController`.
 - `expo-secure-store`.
-- Jest 30 and React Native Testing Library 14.
+- Vitest 5.1 and React Native Testing Library 14.
 
 The target was scaffolded with the blank TypeScript template. Expo Router was
 not included because the current scope has no screens or navigation.
@@ -34,13 +34,13 @@ not included because the current scope has no screens or navigation.
 | Source area                | Target area                                  | Notes                                                   |
 | -------------------------- | -------------------------------------------- | ------------------------------------------------------- |
 | Login/profile/logout calls | `src/services/auth/`                         | Same endpoint paths and active-profile rule             |
-| Response handling          | `src/services/auth/authMappers.ts`           | Runtime validation instead of trusting response objects |
+| Response handling          | `src/services/auth/auth-mappers.ts`          | Runtime validation instead of trusting response objects |
 | Auth endpoint constants    | `src/constants/api.ts`                       | Only the three endpoints in scope                       |
 | Pagination helper          | `src/utils/pagination.ts`                    | Pure TypeScript, tested                                 |
 | Deal/promotion pricing     | `src/utils/pricing.ts`                       | Pure TypeScript, tested                                 |
 | Compliance helpers         | `src/utils/compliance.ts`                    | Pure TypeScript, tested                                 |
 | Role names                 | `src/constants/app.ts`, `src/utils/roles.ts` | Known roles only; server remains authoritative          |
-| Session storage concern    | `src/services/storage/sessionStorage.ts`     | SecureStore instead of `localStorage`                   |
+| Session storage concern    | `src/services/storage/session-storage.ts`    | SecureStore instead of `localStorage`                   |
 
 ## What was intentionally not ported
 
@@ -146,15 +146,9 @@ to present them; the foundation only renders one bootstrap status message.
 
 ## Verification performed
 
-The following were run in the target repository:
-
-```text
-npm run typecheck     pass
-npm run lint          pass
-npm run format:check  pass after formatting
-npm test -- --runInBand
-  18 suites passed, 79 tests passed
-```
+The initial foundation verification used the previous test runner. After the
+test migration, run `npm run verify`; the empty suite is expected to pass and
+the test guard prints a warning until feature tests are added.
 
 No Expo dev server, emulator, simulator, or physical device was started.
 `npm audit` reported 31 transitive vulnerabilities (1 low, 30 moderate; no high

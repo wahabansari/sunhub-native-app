@@ -4,19 +4,23 @@
 
 Copy `.env.example` to `.env.local` for local development.
 
-| Variable                         | Required | Default       | Purpose                                       |
-| -------------------------------- | -------- | ------------- | --------------------------------------------- |
-| `EXPO_PUBLIC_APP_ENV`            | No       | `development` | `development`, `staging`, or `production`     |
-| `EXPO_PUBLIC_API_BASE_URL`       | Yes      | none          | API origin, with or without trailing slash    |
-| `EXPO_PUBLIC_API_VERSION`        | No       | `/v1`         | Version path segment                          |
-| `EXPO_PUBLIC_REQUEST_TIMEOUT_MS` | No       | `60000`       | Request timeout, 1–300000 ms                  |
-| `EXPO_PUBLIC_LOG_LEVEL`          | No       | `warn`        | `debug`, `info`, `warn`, `error`, or `silent` |
+| Variable                          | Required | Default       | Purpose                                                                  |
+| --------------------------------- | -------- | ------------- | ------------------------------------------------------------------------ |
+| `EXPO_PUBLIC_APP_ENV`             | No       | `development` | `development`, `staging`, or `production`                                |
+| `EXPO_PUBLIC_API_BASE_URL`        | Yes      | none          | API origin, with or without trailing slash                               |
+| `EXPO_PUBLIC_BROKER_API_BASE_URL` | No       | empty         | Broker/listing API origin; homepage deals degrade gracefully when absent |
+| `EXPO_PUBLIC_MEDIA_BASE_URL`      | No       | Sunhub media  | Base URL used to resolve product and deal image paths                    |
+| `EXPO_PUBLIC_API_VERSION`         | No       | `/v1`         | Version path segment                                                     |
+| `EXPO_PUBLIC_REQUEST_TIMEOUT_MS`  | No       | `60000`       | Request timeout, 1–300000 ms                                             |
+| `EXPO_PUBLIC_LOG_LEVEL`           | No       | `warn`        | `debug`, `info`, `warn`, `error`, or `silent`                            |
 
 Example:
 
 ```dotenv
 EXPO_PUBLIC_APP_ENV=development
 EXPO_PUBLIC_API_BASE_URL=https://api.example.com
+EXPO_PUBLIC_BROKER_API_BASE_URL=https://broker-api.example.com/api
+EXPO_PUBLIC_MEDIA_BASE_URL=https://media.sunhub.com
 EXPO_PUBLIC_API_VERSION=/v1
 EXPO_PUBLIC_REQUEST_TIMEOUT_MS=60000
 EXPO_PUBLIC_LOG_LEVEL=warn
@@ -47,6 +51,8 @@ each variable statically:
 export const env = parseEnv({
   appEnv: process.env.EXPO_PUBLIC_APP_ENV,
   apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL,
+  brokerApiBaseUrl: process.env.EXPO_PUBLIC_BROKER_API_BASE_URL,
+  mediaBaseUrl: process.env.EXPO_PUBLIC_MEDIA_BASE_URL,
   apiVersion: process.env.EXPO_PUBLIC_API_VERSION,
   requestTimeoutMs: process.env.EXPO_PUBLIC_REQUEST_TIMEOUT_MS,
   logLevel: process.env.EXPO_PUBLIC_LOG_LEVEL,
@@ -56,7 +62,7 @@ export const env = parseEnv({
 Expo's inliner does not replace dynamic access such as `process.env[key]`. Keep
 new references static and add them here.
 
-`parseEnv()` in `src/config/envSchema.ts` is pure and testable. It validates:
+`parseEnv()` in `src/config/env-schema.ts` is pure and testable. It validates:
 
 - `EXPO_PUBLIC_APP_ENV` is one of the allowed names.
 - `EXPO_PUBLIC_API_BASE_URL` is present and starts with `http://` or `https://`.
@@ -104,7 +110,7 @@ metadata even after redaction, so enable it deliberately.
 When adding a variable:
 
 1. Add it to `.env.example` with a safe placeholder.
-2. Add it to `EnvSource` and `parseEnv()` in `src/config/envSchema.ts`.
+2. Add it to `EnvSource` and `parseEnv()` in `src/config/env-schema.ts`.
 3. Add a static reference in `src/config/env.ts`.
 4. Add validation tests in `tests/unit/env.test.ts`.
 5. Update this document.

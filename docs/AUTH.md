@@ -103,7 +103,7 @@ interface StoredSession {
 
 Storage rules:
 
-- SecureStore is used through `src/services/storage/sessionStorage.ts`.
+- SecureStore is used through `src/services/storage/session-storage.ts`.
 - The value is JSON-serialized.
 - Malformed or missing-token values are treated as signed out and deleted
   best-effort.

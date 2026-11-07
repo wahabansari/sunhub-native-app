@@ -8,8 +8,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["expo/types", "jest"]
+    "types": ["expo/types", "vitest/globals"]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "nativewind-env.d.ts"],
   "exclude": ["node_modules", "coverage", "dist", ".expo"]
 }

@@ -10,6 +10,11 @@ exercised without inventing features.
 The foundation was derived by inspecting the web reference at `../sunhub3.0`.
 The source project was not modified.
 
+The reference is a behavior and contract source, not a codebase to copy. The
+mobile architecture ports applicable product domains and API contracts through
+typed services, runtime mappers, Context state, SecureStore, fetch, and
+React Native UI boundaries. See [REFERENCE-INTEGRATION.md](REFERENCE-INTEGRATION.md).
+
 ## Runtime composition
 
 ```text
@@ -23,7 +28,7 @@ index.ts
               useAuth()
 ```
 
-`src/providers/AppProviders.tsx` is the composition root. It constructs no
+`src/providers/app-providers.tsx` is the composition root. It constructs no
 services directly; `src/services/auth/index.ts` wires the API client, logger, and
 secure storage into `authService`. This keeps the UI independent of concrete
 transport and storage implementations.
@@ -52,13 +57,75 @@ Dependency direction:
 UI -> hooks/contexts -> services -> config/errors -> utils/types
 ```
 
+Server state uses TanStack React Query. `AppProviders` in `app-providers.tsx` owns the single
+`QueryClient`; domain hooks own query keys and call React-free services. Local
+UI state remains in components, while query caching, retries, stale data, and
+refetching remain in React Query. See [QUERY.md](QUERY.md).
+
 Services must not import React components, screens, contexts, or hooks. Pure
 utilities must not import services. This keeps business logic testable without a
 renderer and makes future screens thin.
 
+## Feature and page structure
+
+New work is organized by responsibility, not by whichever file is easiest to
+add first. Use lowercase kebab-case for every new folder and file. A page is
+planned and built in this sequence:
+
+```text
+route/page
+  -> page sections
+    -> feature components
+      -> focused visual primitives
+```
+
+For example, a product page may become `product-page.tsx`,
+`product-hero.tsx`, `product-summary.tsx`, and `product-price.tsx`. The route
+owns composition, sections own layout/data coordination, components own a
+single visual responsibility, and primitives own small repeated UI. Keep
+feature-specific pieces together until they are genuinely reused. Do not make
+one giant screen file or split every text node into a component.
+
+Use this ownership table when deciding where code belongs:
+
+| Concern                   | Location                                 | Rule                           |
+| ------------------------- | ---------------------------------------- | ------------------------------ |
+| Route composition         | `src/app/`                               | Expo Router files only         |
+| Visual UI                 | `src/components/<feature>/`              | Props in, user intents out     |
+| Server state              | `src/services/<feature>/` + `src/hooks/` | Service validates; hook caches |
+| Client cross-screen state | `src/contexts/<feature>/`                | Context plus focused reducer   |
+| Pure transformation       | `src/utils/` or feature mapper           | No React, API, or env access   |
+| API paths                 | `src/constants/api.ts`                   | No URL literals in UI          |
+| Query keys                | `src/constants/query-keys.ts`            | Stable, bounded, non-sensitive |
+
+Every page plan must name its sections, component boundaries, data source,
+loading/empty/error/retry states, animation ownership, and tests before JSX is
+written. This keeps the UI scalable and lets an agent work on one section
+without losing the page contract.
+
+For each API-backed feature, use this flow:
+
+```text
+screen/component
+  -> hook or focused context
+  -> domain service
+  -> API client
+  -> runtime mapper (unknown -> domain type)
+  -> safe AppError on failure
+```
+
+No component may construct endpoint URLs, attach bearer tokens, parse response
+envelopes, or decide transport retry behavior.
+
+For query-backed data, use the single `QueryClient` from `AppProviders`, a
+stable key from `src/constants/query-keys.ts`, a React-free service, and a hook
+that exposes safe UI state. Mutations invalidate the smallest related key after
+success. Context is reserved for client state such as session or a cross-screen
+draft; do not duplicate React Query data in Context.
+
 ## Auth state
 
-`src/contexts/auth/authReducer.ts` defines four values:
+`src/contexts/auth/auth-reducer.ts` defines four values:
 
 ```ts
 interface AuthState {
@@ -124,7 +191,7 @@ See [AUTH.md](AUTH.md) for endpoint details and security decisions.
 
 ## Configuration
 
-`src/config/envSchema.ts` is a pure parser. `src/config/env.ts` is the only file
+`src/config/env-schema.ts` is a pure parser. `src/config/env.ts` is the only file
 that reads `process.env.EXPO_PUBLIC_*`. Invalid values throw `ConfigError` during
 module initialization, which fails fast instead of producing confusing runtime
 behavior.
@@ -136,7 +203,9 @@ See [ENVIRONMENT.md](ENVIRONMENT.md).
 NativeWind 4 (Tailwind CSS 3) is the styling layer. Components use `className`,
 and the Tailwind theme in `tailwind.config.js` mirrors the design tokens in
 `src/theme/tokens.ts` (`colors`, `spacing`, `radii`, and `typography`). The two
-files must be updated together.
+files must be updated together. The approved palette and component-state rules
+are documented in [STYLING.md](STYLING.md); no component may introduce colors
+outside that allowlist.
 
 - `babel.config.js` adds `jsxImportSource: 'nativewind'` and the NativeWind
   Babel preset.
@@ -147,8 +216,9 @@ files must be updated together.
   setup.
 - `StyleSheet` remains valid for runtime-computed values and the
   `ErrorBoundary` fallback, which does not depend on Tailwind.
-- Jest loads `react-native-css-interop/test/setup` and maps `.css` imports to a
-  local mock.
+- Vitest runs in the Node environment with CSS processing disabled. React Native
+  Testing Library uses its Test Renderer, so component tests do not require a
+  browser DOM or a device.
 
 See [STYLING.md](STYLING.md) for tokens, conventions, and testing notes.
 
@@ -165,7 +235,7 @@ See [STYLING.md](STYLING.md) for tokens, conventions, and testing notes.
 - **Persist roles.** Role-gated UI can render immediately after a cold start
   while the profile is re-fetched. Profile fields are never trusted from disk.
 - **No token in context.** Components cannot accidentally log or render it.
-- **RNTL 14.** Tests use the async APIs required by React 19 and the current
+- **Vitest + RNTL 14.** Tests use Vitest with RNTL's async APIs required by React 19 and the current
   renderer.
 - **NativeWind 4, not v5.** v5 is a release candidate. v4 is the stable line and
   keeps the Tailwind 3 configuration the app already documents.

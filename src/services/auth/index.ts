@@ -1,8 +1,8 @@
 import { apiClient } from '@/services/api';
 import { logger } from '@/services/logging';
-import { createSessionStorage } from '@/services/storage/sessionStorage';
+import { createSessionStorage } from '@/services/storage/session-storage';
 
-import { createAuthService } from './authService';
+import { createAuthService } from './auth-service';
 
 export const authService = createAuthService({
   api: apiClient,
@@ -10,4 +10,4 @@ export const authService = createAuthService({
   logger,
 });
 
-export type { AuthServiceDependencies } from './authService';
+export type { AuthServiceDependencies } from './auth-service';

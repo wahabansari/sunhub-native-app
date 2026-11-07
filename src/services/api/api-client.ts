@@ -1,4 +1,4 @@
-import { AppError } from '@/errors/AppError';
+import { AppError } from '@/errors/app-error';
 import type { Logger } from '@/services/logging/logger';
 import type { HttpMethod } from '@/types/api';
 

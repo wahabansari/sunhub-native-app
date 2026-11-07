@@ -10,12 +10,30 @@ that apply to every task.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/STYLING.md](docs/STYLING.md)
 - [docs/API.md](docs/API.md)
+- [docs/REFERENCE-INTEGRATION.md](docs/REFERENCE-INTEGRATION.md) — read-only web reference mapping and API porting workflow.
 - [docs/AUTH.md](docs/AUTH.md)
 - [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)
 - [docs/TESTING.md](docs/TESTING.md)
 
 The web reference at `../sunhub3.0` is read-only. Do not edit it or copy secrets
 from it.
+
+## Required reading order for every task
+
+1. Read this file and identify the requested product/domain scope.
+2. Read [docs/AGENTS.md](docs/AGENTS.md) completely.
+3. Read [docs/REFERENCE-INTEGRATION.md](docs/REFERENCE-INTEGRATION.md) before
+   touching API, auth, data, or feature architecture.
+4. Read the relevant architecture, API, auth, environment, styling, and testing
+   docs before editing.
+5. Inspect the corresponding read-only source in `D:\Sunhub\sunhub3.0` and
+   record endpoint contracts and behavior differences.
+6. Implement the mobile-native equivalent in TypeScript; never copy web code or
+   web state-management patterns.
+7. Add tests, update the relevant docs, and run verification.
+
+If the reference contract is unclear, do not invent an endpoint or response
+shape. Document the uncertainty and ask for the missing contract.
 
 ## Expo documentation
 

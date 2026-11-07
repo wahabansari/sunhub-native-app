@@ -11,6 +11,8 @@ const LOG_LEVELS: readonly LogLevel[] = ['debug', 'info', 'warn', 'error', 'sile
 export interface EnvSource {
   appEnv?: string;
   apiBaseUrl?: string;
+  brokerApiBaseUrl?: string;
+  mediaBaseUrl?: string;
   apiVersion?: string;
   requestTimeoutMs?: string;
   logLevel?: string;
@@ -20,6 +22,8 @@ export interface AppEnvConfig {
   appEnv: AppEnv;
   isProduction: boolean;
   apiBaseUrl: string;
+  brokerApiBaseUrl: string;
+  mediaBaseUrl: string;
   apiVersion: string;
   requestTimeoutMs: number;
   logLevel: LogLevel;
@@ -55,6 +59,28 @@ function parseApiBaseUrl(value: string | undefined): string {
     throw new ConfigError('EXPO_PUBLIC_API_BASE_URL must start with http:// or https://.');
   }
 
+  return normalized.replace(/\/+$/, '');
+}
+
+function parseOptionalApiBaseUrl(value: string | undefined): string {
+  const normalized = value?.trim();
+
+  if (!normalized) {
+    return '';
+  }
+
+  if (!/^https?:\/\//i.test(normalized)) {
+    throw new ConfigError('EXPO_PUBLIC_BROKER_API_BASE_URL must start with http:// or https://.');
+  }
+
+  return normalized.replace(/\/+$/, '');
+}
+
+function parseMediaBaseUrl(value: string | undefined): string {
+  const normalized = (value ?? 'https://media.sunhub.com').trim();
+  if (!/^https?:\/\//i.test(normalized)) {
+    throw new ConfigError('EXPO_PUBLIC_MEDIA_BASE_URL must start with http:// or https://.');
+  }
   return normalized.replace(/\/+$/, '');
 }
 
@@ -96,6 +122,8 @@ export function parseEnv(source: EnvSource): AppEnvConfig {
     appEnv,
     isProduction: appEnv === 'production',
     apiBaseUrl: parseApiBaseUrl(source.apiBaseUrl),
+    brokerApiBaseUrl: parseOptionalApiBaseUrl(source.brokerApiBaseUrl),
+    mediaBaseUrl: parseMediaBaseUrl(source.mediaBaseUrl),
     apiVersion: parseApiVersion(source.apiVersion),
     requestTimeoutMs: parseTimeout(source.requestTimeoutMs),
     logLevel: parseLogLevel(source.logLevel),

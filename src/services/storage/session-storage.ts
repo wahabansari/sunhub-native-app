@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
 import { AUTH_SESSION_KEY } from '@/constants/storage';
-import { AppError } from '@/errors/AppError';
+import { AppError } from '@/errors/app-error';
 import type { StoredSession } from '@/types/auth';
 import { asNonEmptyString, asStringArray, isRecord } from '@/utils/guards';
 

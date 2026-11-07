@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useReducer, type ReactNode } from 'rea
 import { toUserMessage } from '@/errors';
 import type { AuthService, SignInCredentials } from '@/types/auth';
 
-import { AuthContext } from './AuthContext';
-import { authReducer, initialAuthState } from './authReducer';
+import { AuthContext } from './auth-context';
+import { authReducer, initialAuthState } from './auth-reducer';
 
 export interface AuthProviderProps {
   service: AuthService;

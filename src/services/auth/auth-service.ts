@@ -1,8 +1,8 @@
-import { API_ENDPOINTS } from '@/constants/api';
-import { AppError, isAppError } from '@/errors/AppError';
-import type { ApiClient } from '@/services/api/client';
+import { AUTH_ENDPOINTS } from '@/constants/api';
+import { AppError, isAppError } from '@/errors/app-error';
+import type { ApiClient } from '@/services/api/api-client';
 import type { Logger } from '@/services/logging/logger';
-import type { SessionStorage } from '@/services/storage/sessionStorage';
+import type { SessionStorage } from '@/services/storage/session-storage';
 import type { AuthProfile, AuthService, AuthUser, SignInCredentials } from '@/types/auth';
 
 import {
@@ -10,7 +10,7 @@ import {
   makeAuthUser,
   parseLoginResponse,
   parseProfileResponse,
-} from './authMappers';
+} from './auth-mappers';
 
 export interface AuthServiceDependencies {
   api: ApiClient;
@@ -24,7 +24,7 @@ export function createAuthService({ api, storage, logger }: AuthServiceDependenc
   async function loadProfile(accessToken: string): Promise<AuthProfile> {
     const payload = await api.request<unknown>({
       method: 'GET',
-      path: API_ENDPOINTS.profile,
+      path: AUTH_ENDPOINTS.profile,
       token: accessToken,
     });
 
@@ -64,7 +64,7 @@ export function createAuthService({ api, storage, logger }: AuthServiceDependenc
       try {
         payload = await api.request<unknown>({
           method: 'POST',
-          path: API_ENDPOINTS.login,
+          path: AUTH_ENDPOINTS.login,
           body: credentials,
         });
       } catch (error) {
@@ -120,7 +120,7 @@ export function createAuthService({ api, storage, logger }: AuthServiceDependenc
         if (session) {
           await api.request<unknown>({
             method: 'POST',
-            path: API_ENDPOINTS.logout,
+            path: AUTH_ENDPOINTS.logout,
             body: {},
             token: session.accessToken,
           });

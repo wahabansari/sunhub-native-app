@@ -27,11 +27,11 @@ module.exports = defineConfig([
     },
   },
   {
-    files: ['tests/**/*.{ts,tsx}', 'jest.config.js'],
+    files: ['tests/**/*.{ts,tsx}', 'vitest.config.js', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: {
-        ...globals.jest,
         ...globals.node,
+        ...globals.vitest,
       },
     },
   },

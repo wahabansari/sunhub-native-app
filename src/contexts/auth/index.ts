@@ -1,5 +1,5 @@
-export { AuthContext } from './AuthContext';
-export { AuthProvider } from './AuthProvider';
-export { authReducer, initialAuthState } from './authReducer';
-export type { AuthContextValue } from './AuthContext';
-export type { AuthAction, AuthState, AuthStatus } from './authReducer';
+export { AuthContext } from './auth-context';
+export { AuthProvider } from './auth-provider';
+export { authReducer, initialAuthState } from './auth-reducer';
+export type { AuthContextValue } from './auth-context';
+export type { AuthAction, AuthState, AuthStatus } from './auth-reducer';

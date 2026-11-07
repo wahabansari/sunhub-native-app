@@ -5,13 +5,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#F7F8FA',
-        surface: '#FFFFFF',
-        text: '#111827',
-        muted: '#6B7280',
-        primary: '#0F766E',
-        danger: '#B91C1C',
+        primary: '#F97316',
+        'primary-light': '#FFEDD9',
+        accent: '#FDBA74',
+        ink: '#1A2B3C',
+        price: '#C95200',
+        surface: '#F5F6F8',
         border: '#E5E7EB',
+        success: '#067647',
+        'on-primary': '#FFFFFF',
       },
       spacing: {
         xs: '4px',
@@ -29,6 +31,9 @@ module.exports = {
         title: '24px',
         body: '16px',
         caption: '13px',
+      },
+      fontFamily: {
+        inter: 'Inter_400Regular',
       },
     },
   },

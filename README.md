@@ -50,9 +50,11 @@ npm run typecheck     # tsc --noEmit
 npm run lint          # ESLint
 npm run format        # Prettier write
 npm run format:check  # Prettier check
-npm test              # Jest
-npm run test:coverage # Jest with coverage
-npm run verify        # typecheck + lint + format check + tests
+npm test              # Vitest run
+npm run test:watch    # Vitest watch mode
+npm run test:coverage # Vitest with coverage
+npm run test:guard    # warn when no Vitest tests exist
+npm run verify        # typecheck + lint + format check + test guard + tests
 ```
 
 Install native packages with `npx expo install <package>` so Expo resolves
@@ -83,7 +85,7 @@ src/theme/                 Shared design tokens
 src/types/                 Shared domain and API types
 src/utils/                 Guards, formatting, roles, pricing, pagination
 src/validation/            Form-level validation helpers
-tests/                     Unit, component, and integration tests
+tests/                     Unit, component, and integration Vitest tests
 docs/                      Architecture, API, auth, env, test, migration docs
 ```
 
@@ -93,6 +95,7 @@ docs/                      Architecture, API, auth, env, test, migration docs
 - [Architecture](docs/ARCHITECTURE.md)
 - [Styling](docs/STYLING.md)
 - [API](docs/API.md)
+- [Reference integration](docs/REFERENCE-INTEGRATION.md)
 - [Authentication](docs/AUTH.md)
 - [Environment](docs/ENVIRONMENT.md)
 - [Testing](docs/TESTING.md)
@@ -112,7 +115,8 @@ docs/                      Architecture, API, auth, env, test, migration docs
 
 ## Current verification
 
-The foundation passes TypeScript, ESLint, Prettier, and Jest. See
-`docs/TESTING.md` for the exact test scope and commands. No device, emulator, or
-Expo dev server was started during setup.
+The foundation passes TypeScript, ESLint, Prettier, and the Vitest workflow. See
+`docs/TESTING.md` for the test policy and commands. No device, emulator, or Expo
+dev server was started during setup.
+
 # sunhub-native-app

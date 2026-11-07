@@ -38,31 +38,47 @@ Do not import `global.css` from more than one module.
 
 ## Design tokens
 
-The Tailwind theme mirrors `src/theme/tokens.ts`: `colors`, `spacing`,
-`radii`, and `typography`. When a token changes, update both files.
+The mobile artifact's explicit token panel is the source of truth. It defines
+eight named colors; white is also explicitly required for primary text and
+icons. Therefore the approved palette contains nine distinct colors:
 
-| Token                | Utility examples           |
-| -------------------- | -------------------------- |
-| `colors.background`  | `bg-background`            |
-| `colors.surface`     | `bg-surface`               |
-| `colors.text`        | `text-text`                |
-| `colors.muted`       | `text-muted`               |
-| `colors.primary`     | `text-primary`             |
-| `colors.danger`      | `text-danger`              |
-| `colors.border`      | `border-border`            |
-| `spacing.xs`–`xl`    | `p-lg`, `mt-sm`, `gap-md`  |
-| `radii.sm`–`lg`      | `rounded-sm`, `rounded-lg` |
-| `typography.title`   | `text-title`               |
-| `typography.body`    | `text-body`                |
-| `typography.caption` | `text-caption`             |
+| Token          | Hex       | Use                          | Approved components and states                                                      |
+| -------------- | --------- | ---------------------------- | ----------------------------------------------------------------------------------- |
+| `primary`      | `#F97316` | Main action and brand orange | Primary buttons, active tabs, selected controls, sticky CTAs, focused action states |
+| `primaryLight` | `#FFEDD9` | Soft primary tint            | Selected chips, light tabs, add-to-cart buttons, soft action backgrounds            |
+| `accent`       | `#FDBA74` | Secondary orange emphasis    | Badges, highlights, progress accents, supporting emphasis near primary actions      |
+| `ink`          | `#1A2B3C` | Main readable text and icons | Headings, body text, labels, navigation, default icon state                         |
+| `price`        | `#C95200` | Price and monetary emphasis  | Product prices, deal prices, savings, offer amounts, non-destructive warning copy   |
+| `surface`      | `#F5F6F8` | Light app and card surface   | Screen background, cards, sheets, input backgrounds, neutral containers             |
+| `border`       | `#E5E7EB` | Subtle separation            | Card borders, dividers, input outlines, inactive control boundaries                 |
+| `success`      | `#067647` | Positive status              | Success badges, confirmed/paid/delivered states, completion feedback                |
+| `onPrimary`    | `#FFFFFF` | Contrast on primary          | Text and icons placed directly on `primary` backgrounds                             |
 
-Two naming quirks follow from the source token names:
+### Strict usage policy
 
-- `text-title`, `text-body`, and `text-caption` set font size.
-- `text-text` sets the text color because the color token is named `text`.
+- These are the only approved design colors. Do not add raw hex values, CSS
+  color names, Tailwind palette colors, gradients, dark-mode colors, or new
+  semantic colors without an updated design reference and documentation.
+- `primary` is for actions and selected states, not large body copy.
+- `primaryLight` is for a soft background behind a primary-related control;
+  use `primary` for the actual action text or icon.
+- `price` is reserved for money, deal emphasis, savings, and the current
+  temporary non-destructive error copy. The design has no dedicated destructive
+  error token; add one only when the product design specifies it.
+- `success` is reserved for positive outcomes. Do not use it for generic
+  decoration.
+- `onPrimary` is the only approved color for content directly on `primary`.
+- Opacity modifiers such as `text-ink/70` are allowed only when the base token
+  remains one of the approved colors and the reduced contrast is intentional.
+- Every new component must document which token it uses for default, selected,
+  disabled, loading, success, empty, and error states that apply to it.
 
-Use the semantic names instead of raw palette classes such as `bg-gray-100`.
-Arbitrary values (`bg-[#123456]`) are a last resort; add a token instead.
+Use semantic classes such as `bg-primary`, `bg-surface`, `text-ink`,
+`text-price`, `text-success`, `border-border`, and `text-on-primary`. Never use
+`bg-[#...]`, `text-gray-*`, `text-white`, or equivalent raw palette utilities.
+
+The Tailwind theme must mirror `src/theme/tokens.ts` exactly. When a token
+changes, update both files in the same change and run `npm run format`.
 
 ## Conventions
 
@@ -75,11 +91,9 @@ Arbitrary values (`bg-[#123456]`) are a last resort; add a token instead.
 
 ## Testing
 
-- `jest.config.js` loads `react-native-css-interop/test/setup` through
-  `setupFiles`.
-- `.css` imports resolve to `tests/styleMock.ts`; tests must not parse real CSS.
-- Do not add `react-native-css-interop/test/setupAfterEnv` on Jest 30. It imports
-  `expect/build/matchers`, which Jest 30 no longer exposes.
+- Vitest runs with `test.css: false`; tests must not parse real CSS.
+- No `react-native-css-interop` test setup is needed. The Reanimated/CSS
+  interop runtime is intentionally outside the Vitest test environment.
 - Component tests assert visible text and accessible roles. NativeWind passes
   `className` through to the rendered component; computed style assertions are
   brittle and usually unnecessary.
