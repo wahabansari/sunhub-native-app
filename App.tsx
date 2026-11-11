@@ -7,11 +7,15 @@ import {
   Inter_700Bold,
 } from '@expo-google-fonts/inter';
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
+import { LogBox, Text, View } from 'react-native';
 
 import { APP_NAME } from '@/constants/app';
 import { useAuth } from '@/hooks/use-auth';
 import { AppProviders } from '@/providers/app-providers';
+
+// ImageBackground is used internally by a bundled dependency on this SDK version.
+// The warning is harmless and unfixable without patching the package.
+LogBox.ignoreLogs(['ImageBackground is deprecated']);
 
 function BootstrapStatus() {
   const { state } = useAuth();

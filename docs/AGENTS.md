@@ -223,7 +223,7 @@ non-blocking, log only safe metadata and document why the user can continue.
   from multiple modules.
 - Use only the approved design tokens documented in [STYLING.md](STYLING.md):
   `primary`, `primary-light`, `accent`, `ink`, `price`, `surface`, `border`,
-  `success`, and `on-primary`. Avoid raw palette and arbitrary values.
+  `success`, `danger`, `send`, and `on-primary`. Avoid raw palette and arbitrary values.
 - Every component state must use a documented token. Do not invent colors for
   loading, empty, disabled, validation, or error states.
 - Use `StyleSheet` for runtime-computed values, animated styles, or third-party

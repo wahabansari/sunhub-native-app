@@ -13,7 +13,7 @@ export const apiClient = createApiClient({
 export const brokerApiClient = env.brokerApiBaseUrl
   ? createApiClient({
       baseUrl: env.brokerApiBaseUrl,
-      apiVersion: env.apiVersion,
+      apiVersion: '',
       timeoutMs: env.requestTimeoutMs,
       logger,
     })
