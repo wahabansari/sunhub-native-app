@@ -6,6 +6,8 @@ export interface AuthState {
   status: AuthStatus;
   user: AuthUser | null;
   error: string | null;
+  /** Machine-readable code of the last sign-in failure, e.g. `AUTH_UNVERIFIED`. */
+  errorCode: string | null;
   isSubmitting: boolean;
 }
 
@@ -13,6 +15,7 @@ export const initialAuthState: AuthState = {
   status: 'initializing',
   user: null,
   error: null,
+  errorCode: null,
   isSubmitting: false,
 };
 
@@ -21,7 +24,7 @@ export type AuthAction =
   | { type: 'RESTORE_FAILED'; message: string }
   | { type: 'SIGN_IN_STARTED' }
   | { type: 'SIGN_IN_SUCCEEDED'; user: AuthUser }
-  | { type: 'SIGN_IN_FAILED'; message: string }
+  | { type: 'SIGN_IN_FAILED'; message: string; code?: string }
   | { type: 'SIGN_OUT_STARTED' }
   | { type: 'SIGN_OUT_SUCCEEDED' }
   | { type: 'SIGN_OUT_FAILED'; message: string }
@@ -35,6 +38,7 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
         status: action.user ? 'authenticated' : 'unauthenticated',
         user: action.user,
         error: null,
+        errorCode: null,
         isSubmitting: false,
       };
 
@@ -51,6 +55,7 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
       return {
         ...state,
         error: null,
+        errorCode: null,
         isSubmitting: true,
       };
 
@@ -59,6 +64,7 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
         status: 'authenticated',
         user: action.user,
         error: null,
+        errorCode: null,
         isSubmitting: false,
       };
 
@@ -68,6 +74,7 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
         status: 'unauthenticated',
         user: null,
         error: action.message,
+        errorCode: action.code ?? null,
         isSubmitting: false,
       };
 
@@ -75,6 +82,7 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
       return {
         ...state,
         error: null,
+        errorCode: null,
         isSubmitting: true,
       };
 
@@ -83,6 +91,7 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
         status: 'unauthenticated',
         user: null,
         error: null,
+        errorCode: null,
         isSubmitting: false,
       };
 

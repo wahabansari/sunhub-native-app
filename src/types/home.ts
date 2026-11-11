@@ -1,8 +1,11 @@
+export type CategoryArtKey = 'panel' | 'inv' | 'bat' | 'rack' | 'comp' | 'diy' | 'ev';
+
 export interface HomeCategory {
   id: string;
   name: string;
-  icon: string;
-  count?: number;
+  art: CategoryArtKey;
+  /** Top-level catalog category id used to filter fixed-price products. */
+  parentId: number;
 }
 
 export interface HomeProduct {
@@ -13,7 +16,8 @@ export interface HomeProduct {
   imageUrl?: string;
   shippingLabel?: string;
   stock?: number;
-  sponsored?: boolean;
+  sponsorLabel?: string;
+  badges: string[];
   brand?: string;
   category?: string;
   condition?: string;
@@ -28,32 +32,40 @@ export interface HomeDeal {
   location?: string;
   imageUrl?: string;
   sponsored?: boolean;
-  tags?: string[];
   brand?: string;
   wattage?: string;
   moqUnit?: string;
   shipping?: string;
+  category?: string;
+  /** Panels are priced per watt; every other listing type is priced per unit. */
+  perWatt: boolean;
+  badges: string[];
 }
 
 export interface HomeBrand {
   id: string;
   name: string;
   initials: string;
+  logoUrl?: string;
 }
 
 export interface HomeArticle {
   id: string;
   title: string;
   category: string;
+  imageUrl?: string;
+  /** Public article page, opened in the browser. */
+  url?: string;
 }
 
-export interface HomeData {
-  categories: HomeCategory[];
-  featuredDeals: HomeDeal[];
-  pickupDeals: HomeDeal[];
-  buyDirectProducts: HomeProduct[];
-  recentDeals: HomeDeal[];
-  hotDeal: HomeDeal | null;
-  brands: HomeBrand[];
-  articles: HomeArticle[];
+export interface HomeReview {
+  id: string;
+  name: string;
+  date: string;
+  text: string;
+}
+
+export interface PickupState {
+  code: string;
+  total: number;
 }

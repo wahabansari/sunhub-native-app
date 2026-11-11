@@ -2,19 +2,61 @@
 
 ## Scope
 
-The foundation implements one auth flow: email/password client sign-in with a
-bearer token, profile verification, secure session restore, and sign-out.
+The app implements email/password sign-in (bearer token, profile verification,
+secure session restore, sign-out) plus the account flows around it:
+registration, resend verification email, forgot password and reset password.
+Screens live in `src/screens/auth/` and are routed from `src/app/`.
 
-The following web reference flows are intentionally not ported:
+Still intentionally not ported from the web reference:
 
 - Google and Facebook sign-in.
 - Guest sign-in and guest-chat conversion.
-- Registration, forgot/reset password, and resend verification.
 - Seller-specific sign-in entry points.
 - Analytics events and cross-tab session broadcasting.
 
 They can be added later as separate, reviewed changes. Their source behavior
 should not be assumed to be correct for mobile.
+
+## Screens and flow
+
+| Route              | Screen                 | Notes                                                               |
+| ------------------ | ---------------------- | ------------------------------------------------------------------- |
+| `/login`           | `LoginScreen`          | Email + password. `?redirect=` returns to the screen that asked.    |
+| `/register`        | `RegisterScreen`       | Buyer/Seller/Both, then a "check your email" confirmation.          |
+| `/forgot-password` | `ForgotPasswordScreen` | Sends the reset email, then offers "I have my reset link".          |
+| `/reset-password`  | `ResetPasswordScreen`  | Opened by deep link, or paste the emailed link.                     |
+| `/account`         | `AccountScreen`        | Signed-in summary and sign-out; redirects to login when signed out. |
+
+- The home header profile button opens `/account` when signed in, else `/login`.
+- `useRequireAuth()` gates chat, offers and cart. It sends signed-out users to
+  `/login?redirect=<path>`; after sign-in the login screen redirects there.
+- `safeRedirect()` only accepts in-app paths (no scheme, no `//`, never an auth
+  route), so a crafted link cannot send a user elsewhere after sign-in.
+- Login HTTP 403 (email not verified) is `AUTH_UNVERIFIED`: the login screen shows
+  the server message with a "Resend verification email" action. 400/401/422 are
+  `AUTH_FAILED` with a generic invalid-credentials message.
+- Reset links: the web link is
+  `https://www.sunhub.com/password/reset?email=…&token=…`. The app handles the
+  `sunhub://reset-password?email=…&token=…` deep link and, for web links, lets
+  the user paste the link (`parseResetLink` accepts only `sunhub.com` hosts and the
+  app scheme). Universal links need associated-domain configuration and a
+  development build; they are not configured yet.
+
+### Account endpoints
+
+| Step                | Method | Path                        | Body                                                                                                             |
+| ------------------- | ------ | --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Register            | POST   | `/v1/client/signup`         | `role`, `firstname`, `companyname?`, `email`, `phone` (digits), `password`, `password_confirmation`, `agreement` |
+| Resend verification | POST   | `/v1/client/email/resend`   | `email`, `password`                                                                                              |
+| Forgot password     | POST   | `/v1/client/password/email` | `email`                                                                                                          |
+| Reset password      | POST   | `/v1/client/password/reset` | `email`, `token`, `password`, `password_confirmation` (+ bearer `token`)                                         |
+
+All four are handled by `createAccountService` (`src/services/auth/account-service.ts`).
+Rejections use the API's `errors` (list or field map) via `parseServerErrors`; 5xx
+bodies are never shown. The web reference sends the reset token both in the body
+and as a bearer header; the mobile service mirrors that because the server
+contract is not otherwise documented. Registration does not sign the user in:
+they must verify their email first.
 
 ## Endpoints
 

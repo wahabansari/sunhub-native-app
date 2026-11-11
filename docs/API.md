@@ -86,27 +86,46 @@ successful responses for five minutes, retains unused results for thirty
 minutes, retries transient failures twice, and exposes `refetch()` for manual
 refresh. See [QUERY.md](QUERY.md) for the required pattern.
 
-| Method | Base       | Path                                                                         | Purpose               |
-| ------ | ---------- | ---------------------------------------------------------------------------- | --------------------- |
-| POST   | Main API   | `/client/categories/search`                                                  | Category catalog      |
-| POST   | Main API   | `/client/items/search`                                                       | Fixed-price products  |
-| POST   | Main API   | `/client/brands/search`                                                      | Brand catalog         |
-| GET    | Broker API | `/listing/featured-deals?listing_type=panels`                                | Featured trader deals |
-| GET    | Broker API | `/listing/graph-deals?state=CA&page=1&limit=20&listing_type=panels`          | Local pickup deals    |
-| GET    | Broker API | `/listing/recent-deals?listing_type=panels`                                  | Recent deals          |
-| GET    | Broker API | `/listing/public/deals?page=1&sort=recommended&homePage=true&isHotDeal=true` | Hot deal              |
-| GET    | WordPress  | `https://www.sunhub.com/blog/wp-json/wp/v2/posts?per_page=6&page=1&_embed`   | Latest articles       |
+| Method | Base       | Path                                                                         | Purpose                 |
+| ------ | ---------- | ---------------------------------------------------------------------------- | ----------------------- |
+| POST   | Main API   | `/client/items/search`                                                       | Fixed-price products    |
+| POST   | Main API   | `/client/brands/search`                                                      | Brand catalog           |
+| GET    | Broker API | `/listing/featured-deals?listing_type=panels`                                | Featured trader deals   |
+| GET    | Broker API | `/broker/sidebar_data?key=homepage`                                          | Pickup-map state counts |
+| GET    | Broker API | `/listing/recent-deals?listing_type=panels`                                  | Recent deals            |
+| GET    | Broker API | `/listing/public/deals?page=1&sort=recommended&homePage=true&isHotDeal=true` | Hot deal                |
+| GET    | WordPress  | `https://www.sunhub.com/blog/wp-json/wp/v2/posts?per_page=6&page=1&_embed`   | Latest articles         |
 
-The broker base is configured with `EXPO_PUBLIC_BROKER_API_BASE_URL`. It is
-optional: if it is absent or a broker request fails, the homepage keeps the
-main catalog data and renders empty states for unavailable marketplace sections.
+The broker base is configured with `EXPO_PUBLIC_BROKER_API_BASE_URL` and is called
+with the `/v1` version segment (unversioned broker paths return 404).
+The pickup map reads `data.state.data[{ state, count }]` from `broker/sidebar_data`,
+the same source the web map uses to colour states. Deal images come from
+`attachments` (type `Image`) when `images` is empty.
+
+Listing screens add: `POST /client/items/search` (filters via `where`, `where_has` and
+`like`; `pagination` in the response), `GET listing/public/deals` with
+`limit/page/listing_type/state/brand/condition/search`, `GET listing/:listingId` for a
+deal, and a product detail read through `items/search` filtered by `uuid` (the
+`/client/items/:uuid` payload has no images or brand). Filter options come from
+`broker/sidebar_data` and `POST /client/brands/search`.
+
+The broker is optional: if it is absent, the broker-backed sections show their empty
+state. Each home section (featured, pickup, buy direct, recent, spotlight, brands,
+articles) is its own query in `src/hooks/use-home-sections.ts` with a 20 second request
+timeout, so a slow or failing endpoint shows that section's skeleton and then a message
+with a Retry button, without blocking the rest of the page. Failures are logged with
+safe metadata, and pulling down on the home screen refetches every section. The articles
+section falls back to a bundled list when the blog is down.
 Every response is treated as `unknown` and normalized before rendering; a
 partial failure never takes down the entire screen.
 
 Buy-direct products use the reference request contract: active, approved items
-with inventory, related images/category/brand data, category parent `40939`,
-and `id DESC` ordering. Product discounts are calculated from `discount_unit`
-(`percent` or `fixed`) before display.
+with inventory, related images/category/brand data and `id DESC` ordering. The home
+slider asks for up to 6 sponsored products (`is_featured_product = 1`, any category)
+and falls back to the newest in-stock products when none are running. Product
+discounts are calculated from `discount_unit` (`percent` or `fixed`) before display.
+The local pickup section loads the deals of the selected state with
+`listing/public/deals?state=XX`.
 
 The current mobile services implement authentication and the homepage data
 contract. The remaining registry entries are intentionally transport-ready,
@@ -146,6 +165,23 @@ Notes:
 - A rejected response (`status` not `true`) uses the first available message from
   `data.error`, `data.message`, or `data.errors`, with a safe fallback.
 - A 401 is mapped to an invalid-credentials message.
+
+### Account flows
+
+Register, resend verification, forgot password and reset password use the
+endpoints listed in [AUTH.md](AUTH.md#account-endpoints). Error bodies are read by
+`src/services/api/error-payload.ts`: `errors` may be a list of strings or a map
+of field name to list of strings, with `message`/`error` as a fallback. The API
+client attaches those messages (`serverMessages`, `fieldErrors`) to `AppError`
+for 4xx responses only.
+
+### Listing filters
+
+Shop (`client/items/search`) and trader (`listing/public/deals`) filters are
+built from one `FilterSelection` by `buildProductBody` / `buildDealQuery`
+(`src/services/catalog/listing-queries.ts`). Filter option lists come from
+`client/brands/search`, `client/categories/search` (sub-categories),
+`client/sectors-count`, and the broker `broker/sidebar_data`.
 
 ### Profile
 

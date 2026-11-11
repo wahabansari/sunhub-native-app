@@ -88,15 +88,16 @@ one giant screen file or split every text node into a component.
 
 Use this ownership table when deciding where code belongs:
 
-| Concern                   | Location                                 | Rule                           |
-| ------------------------- | ---------------------------------------- | ------------------------------ |
-| Route composition         | `src/app/`                               | Expo Router files only         |
-| Visual UI                 | `src/components/<feature>/`              | Props in, user intents out     |
-| Server state              | `src/services/<feature>/` + `src/hooks/` | Service validates; hook caches |
-| Client cross-screen state | `src/contexts/<feature>/`                | Context plus focused reducer   |
-| Pure transformation       | `src/utils/` or feature mapper           | No React, API, or env access   |
-| API paths                 | `src/constants/api.ts`                   | No URL literals in UI          |
-| Query keys                | `src/constants/query-keys.ts`            | Stable, bounded, non-sensitive |
+| Concern                   | Location                                 | Rule                               |
+| ------------------------- | ---------------------------------------- | ---------------------------------- |
+| Route composition         | `src/app/`                               | Expo Router files only             |
+| Screens                   | `src/screens/<feature>/`                 | Compose sections; own screen state |
+| Visual UI                 | `src/components/<feature>/`              | Props in, user intents out         |
+| Server state              | `src/services/<feature>/` + `src/hooks/` | Service validates; hook caches     |
+| Client cross-screen state | `src/contexts/<feature>/`                | Context plus focused reducer       |
+| Pure transformation       | `src/utils/` or feature mapper           | No React, API, or env access       |
+| API paths                 | `src/constants/api.ts`                   | No URL literals in UI              |
+| Query keys                | `src/constants/query-keys.ts`            | Stable, bounded, non-sensitive     |
 
 Every page plan must name its sections, component boundaries, data source,
 loading/empty/error/retry states, animation ownership, and tests before JSX is
@@ -122,6 +123,33 @@ stable key from `src/constants/query-keys.ts`, a React-free service, and a hook
 that exposes safe UI state. Mutations invalidate the smallest related key after
 success. Context is reserved for client state such as session or a cross-screen
 draft; do not duplicate React Query data in Context.
+
+## Listing screens and motion
+
+- Listing screens (shop, products, deals, search) and detail screens share
+  `src/components/listing/` (header, mode bar, filter sheet, result grid, detail
+  parts) and `src/components/catalog/` (cards, product image). Product and deal
+  data flow through `src/services/catalog/` (queries, normalizers, detail
+  mappers) and the hooks in `src/hooks/use-*-list.ts` / `use-*-detail.ts`.
+- Actions that need an account (chat, offers, cart) go through
+  `useRequireAuth()` (`src/hooks/use-require-auth.ts`): signed-in users run the
+  action (or see the feature's coming-soon notice while it is unbuilt), everyone
+  else is sent to `/login?redirect=<current path>` and returned afterwards. There
+  is no cart screen yet.
+- Listing screens show a skeleton grid (`GridSkeleton`, built on `Bone`) while
+  the first page loads. Filters are one `FilterSelection` (`Record<string,
+string[]>`) shared by route params, the sheet and the API query builders. The
+  filter sheet (`FilterSheet`) is a Modal with its own `SafeAreaProvider`,
+  fades its backdrop and slides the sheet in together, lists the same groups as
+  sunhub.com (dependent groups such as sub-category, wattage, color and sector
+  appear per category), and gives any group with more than 6 options a
+  "See more" link and an in-group search. Selected chips, the mode bar and
+  every "add" button use the primary orange.
+- Animation uses `react-native-reanimated` only: `components/motion/` holds the
+  press-scale and staggered-reveal primitives, the home header shadow follows the
+  scroll offset, and `components/splash/animated-splash.tsx` plays over the native
+  splash until the home screen has loaded. The pickup map pans and pinch-zooms
+  with `react-native-gesture-handler`.
 
 ## Auth state
 
@@ -244,8 +272,16 @@ See [STYLING.md](STYLING.md) for tokens, conventions, and testing notes.
 
 ## Future extension points
 
-- **Navigation:** add Expo Router only when screens are requested. Keep routes in
-  `src/app` and non-route code outside it.
+- **Navigation:** Expo Router is adopted. `src/app/_layout.tsx` owns fonts, the
+  splash and providers around a headerless `Stack`; every other file in
+  `src/app` is a thin route that renders a screen from `src/screens/`. Routes:
+  `/` (home), `/shop`, `/search`, `/products` (+ `/products/[uuid]`) and `/deals`
+  (+ `/deals/[listingId]`). List routes read filters from query params
+  (`category`, `brand`, `cec_listed`, `feoc_compliant`, `type`, `state`,
+  `condition`, `q`), validated in `src/utils/listing-filters.ts`.
+  Auth routes: `/login`, `/register`, `/forgot-password`, `/reset-password`
+  (also the `sunhub://reset-password?email=…&token=…` deep link) and `/account`;
+  see [AUTH.md](AUTH.md).
 - **New API endpoints:** add the path to `src/constants/api.ts`, add a typed
   mapper/service, and validate unknown payloads at the boundary.
 - **New shared state:** add a focused context and reducer, not a global store.

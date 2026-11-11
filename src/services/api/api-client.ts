@@ -2,6 +2,8 @@ import { AppError } from '@/errors/app-error';
 import type { Logger } from '@/services/logging/logger';
 import type { HttpMethod } from '@/types/api';
 
+import { parseServerErrors } from './error-payload';
+
 export interface ApiRequestOptions {
   path: string;
   method?: HttpMethod;
@@ -145,9 +147,13 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
             status: response.status,
           });
 
+          const server = parseServerErrors(payload);
+
           throw new AppError('HTTP', `Request failed with status ${response.status}`, {
             status: response.status,
             userMessage: httpUserMessage(response.status),
+            serverMessages: response.status < 500 ? server.messages : [],
+            fieldErrors: response.status < 500 ? server.fields : {},
           });
         }
 

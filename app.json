@@ -22,6 +22,17 @@
       "bundler": "metro",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-secure-store"]
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFFFFF",
+          "imageWidth": 200
+        }
+      ],
+      "expo-router"
+    ],
+    "scheme": "sunhub"
   }
 }

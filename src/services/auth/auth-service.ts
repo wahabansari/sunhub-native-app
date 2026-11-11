@@ -19,6 +19,8 @@ export interface AuthServiceDependencies {
 }
 
 const INVALID_CREDENTIALS_MESSAGE = 'Unable to sign in. Check your email and password.';
+const UNVERIFIED_EMAIL_MESSAGE = 'Please verify your email address before signing in.';
+const REJECTED_STATUSES = new Set([400, 401, 422]);
 
 export function createAuthService({ api, storage, logger }: AuthServiceDependencies): AuthService {
   async function loadProfile(accessToken: string): Promise<AuthProfile> {
@@ -68,9 +70,20 @@ export function createAuthService({ api, storage, logger }: AuthServiceDependenc
           body: credentials,
         });
       } catch (error) {
-        if (isAppError(error) && error.status === 401) {
-          throw new AppError('AUTH_FAILED', 'Login request was unauthorized', {
-            status: 401,
+        if (isAppError(error) && error.status === 403) {
+          throw new AppError('AUTH_UNVERIFIED', 'Login was rejected: email not verified', {
+            status: 403,
+            userMessage: error.serverMessages[0] ?? UNVERIFIED_EMAIL_MESSAGE,
+          });
+        }
+
+        if (
+          isAppError(error) &&
+          error.status !== undefined &&
+          REJECTED_STATUSES.has(error.status)
+        ) {
+          throw new AppError('AUTH_FAILED', 'Login request was rejected', {
+            status: error.status,
             userMessage: INVALID_CREDENTIALS_MESSAGE,
           });
         }

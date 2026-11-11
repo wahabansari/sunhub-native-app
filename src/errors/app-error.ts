@@ -7,6 +7,8 @@ export type AppErrorCode =
   | 'PARSE'
   | 'REQUEST_SERIALIZATION'
   | 'AUTH_FAILED'
+  | 'AUTH_UNVERIFIED'
+  | 'ACCOUNT_REQUEST_FAILED'
   | 'AUTH_INACTIVE'
   | 'AUTH_INVALID_RESPONSE'
   | 'AUTH_INVALID_SESSION'
@@ -16,6 +18,10 @@ export type AppErrorCode =
 export interface AppErrorOptions {
   status?: number;
   userMessage?: string;
+  /** Safe, human-readable messages the server returned for a rejected request. */
+  serverMessages?: string[];
+  /** First server message per form field (e.g. `email`), when the server reports field errors. */
+  fieldErrors?: Record<string, string>;
 }
 
 const DEFAULT_USER_MESSAGE = 'Something went wrong. Please try again.';
@@ -28,6 +34,8 @@ export class AppError extends Error {
   readonly code: AppErrorCode;
   readonly status?: number;
   readonly userMessage: string;
+  readonly serverMessages: string[];
+  readonly fieldErrors: Record<string, string>;
 
   constructor(code: AppErrorCode, message: string, options: AppErrorOptions = {}) {
     super(message);
@@ -35,6 +43,8 @@ export class AppError extends Error {
     this.code = code;
     this.status = options.status;
     this.userMessage = options.userMessage ?? DEFAULT_USER_MESSAGE;
+    this.serverMessages = options.serverMessages ?? [];
+    this.fieldErrors = options.fieldErrors ?? {};
   }
 }
 

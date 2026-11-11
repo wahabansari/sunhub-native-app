@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, type ReactNode } from 'react';
 
-import { toUserMessage } from '@/errors';
+import { toErrorCode, toUserMessage } from '@/errors';
 import type { AuthService, SignInCredentials } from '@/types/auth';
 
 import { AuthContext } from './auth-context';
@@ -44,7 +44,11 @@ export function AuthProvider({ service, children }: AuthProviderProps) {
         dispatch({ type: 'SIGN_IN_SUCCEEDED', user });
         return true;
       } catch (error) {
-        dispatch({ type: 'SIGN_IN_FAILED', message: toUserMessage(error) });
+        dispatch({
+          type: 'SIGN_IN_FAILED',
+          message: toUserMessage(error),
+          code: toErrorCode(error),
+        });
         return false;
       }
     },

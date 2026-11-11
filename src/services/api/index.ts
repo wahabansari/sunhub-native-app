@@ -3,6 +3,9 @@ import { logger } from '@/services/logging';
 
 import { createApiClient } from './api-client';
 
+// The broker API only serves its routes under /v1 (unversioned paths return 404).
+const BROKER_API_VERSION = '/v1';
+
 export const apiClient = createApiClient({
   baseUrl: env.apiBaseUrl,
   apiVersion: env.apiVersion,
@@ -13,7 +16,7 @@ export const apiClient = createApiClient({
 export const brokerApiClient = env.brokerApiBaseUrl
   ? createApiClient({
       baseUrl: env.brokerApiBaseUrl,
-      apiVersion: '',
+      apiVersion: BROKER_API_VERSION,
       timeoutMs: env.requestTimeoutMs,
       logger,
     })
