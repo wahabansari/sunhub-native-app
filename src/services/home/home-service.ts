@@ -43,7 +43,7 @@ export async function loadRecentDeals(): Promise<HomeDeal[]> {
 
 export async function loadSpotlightDeals(): Promise<HomeDeal[]> {
   const payload = await requestBroker(
-    `${API_ENDPOINTS.broker.publicListings}?page=1&sort=recommended&homePage=true&isHotDeal=true`,
+    `${API_ENDPOINTS.broker.publicListings}?page=1&limit=4&sort=recommended&homePage=true&isHotDeal=true`,
     options,
   );
   return rowsFrom(payload).map(normalizeDeal).slice(0, 4);

@@ -9,6 +9,7 @@ import { Poppins_500Medium } from '@expo-google-fonts/poppins/500Medium';
 import { Poppins_600SemiBold } from '@expo-google-fonts/poppins/600SemiBold';
 import { Poppins_700Bold } from '@expo-google-fonts/poppins/700Bold';
 import { useFonts } from 'expo-font';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Stack } from 'expo-router';
 import { hideAsync, preventAutoHideAsync, setOptions } from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -30,7 +31,10 @@ preventAutoHideAsync().catch((error: unknown) => {
     message: error instanceof Error ? error.message : 'unknown error',
   });
 });
-setOptions({ duration: 250, fade: true });
+// Expo Go cannot customise the splash screen; development and release builds can.
+if (Constants.executionEnvironment !== ExecutionEnvironment.StoreClient) {
+  setOptions({ duration: 250, fade: true });
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -71,6 +75,8 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
+            // Screens underneath stop re-rendering while another screen is on top of them.
+            freezeOnBlur: true,
             animation: 'slide_from_right',
             contentStyle: { backgroundColor: '#FFFFFF' },
           }}

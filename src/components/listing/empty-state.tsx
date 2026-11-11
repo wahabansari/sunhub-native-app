@@ -1,6 +1,7 @@
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icons/icon';
+import { Bone, SkeletonPulse } from '@/components/motion/bone';
 import { colors } from '@/theme/tokens';
 
 type Props = {
@@ -36,11 +37,17 @@ export function EmptyState({ icon = 'search', title, message, actionLabel, onAct
   );
 }
 
-export function LoadingState({ label = 'Loading…' }: { label?: string }) {
+/** Skeleton for a page that is still loading: a picture block and a few text lines. */
+export function LoadingState() {
   return (
-    <View className="items-center gap-sm py-[56px]">
-      <ActivityIndicator size="large" color={colors.primary} />
-      <Text className="font-inter text-[13px] text-muted">{label}</Text>
-    </View>
+    <SkeletonPulse>
+      <View className="gap-[12px] px-md pt-sm">
+        <Bone className="aspect-[1/0.8] w-full rounded-[18px]" />
+        <Bone className="h-[16px] w-[85%] rounded-full" />
+        <Bone className="h-[16px] w-[55%] rounded-full" />
+        <Bone className="mt-[6px] h-[26px] w-[35%] rounded-full" />
+        <Bone className="h-[90px] w-full rounded-[14px]" />
+      </View>
+    </SkeletonPulse>
   );
 }

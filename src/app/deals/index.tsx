@@ -1,5 +1,5 @@
-import { DealListScreen } from '@/screens/deals/deal-list-screen';
+import { MarketplaceScreen } from '@/screens/marketplace/marketplace-screen';
 
 export default function Deals() {
-  return <DealListScreen />;
+  return <MarketplaceScreen initialMode="negotiable" />;
 }

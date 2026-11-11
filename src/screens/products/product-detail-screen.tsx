@@ -1,55 +1,19 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
-import { Icon } from '@/components/icons/icon';
+import { QuantityStepper } from '@/components/cart/quantity-stepper';
 import { BottomBar, DetailCard, ImageGallery, SpecTable } from '@/components/listing/detail-parts';
 import { EmptyState, LoadingState } from '@/components/listing/empty-state';
 import { ListingHeader } from '@/components/listing/listing-header';
 import { useGoBack } from '@/hooks/use-go-back';
-import { useRequireAuth } from '@/hooks/use-require-auth';
+import { useAddToCart } from '@/hooks/use-cart';
+import { useCartAction } from '@/hooks/use-cart-action';
 import { useProductDetail } from '@/hooks/use-product-detail';
-import { colors } from '@/theme/tokens';
 import type { ProductDetail } from '@/types/listing';
 import { formatMoney } from '@/utils/home-format';
 
-function QuantityStepper({
-  value,
-  min,
-  max,
-  onChange,
-}: {
-  value: number;
-  min: number;
-  max: number;
-  onChange: (next: number) => void;
-}) {
-  return (
-    <View className="h-[44px] flex-row items-center rounded-full border border-[#D1D5DB]">
-      <Pressable
-        onPress={() => onChange(Math.max(min, value - 1))}
-        accessibilityRole="button"
-        accessibilityLabel="Decrease quantity"
-        className="h-[42px] w-[42px] items-center justify-center rounded-full active:bg-chip"
-      >
-        <Icon name="minus" size={18} color={colors.ink} />
-      </Pressable>
-      <Text className="min-w-[30px] text-center font-inter-semibold text-[16px] text-ink">
-        {value}
-      </Text>
-      <Pressable
-        onPress={() => onChange(Math.min(max, value + 1))}
-        accessibilityRole="button"
-        accessibilityLabel="Increase quantity"
-        className="h-[42px] w-[42px] items-center justify-center rounded-full active:bg-chip"
-      >
-        <Icon name="plus" size={18} color={colors.ink} />
-      </Pressable>
-    </View>
-  );
-}
-
 function ProductBody({ product }: { product: ProductDetail }) {
-  const requireAuth = useRequireAuth();
+  const { add, isAdding } = useAddToCart();
   const max = Math.max(product.moq, product.stock);
   const [quantity, setQuantity] = useState(product.moq);
   const inStock = product.stock > 0;
@@ -113,7 +77,8 @@ function ProductBody({ product }: { product: ProductDetail }) {
       <BottomBar>
         <QuantityStepper value={quantity} min={product.moq} max={max} onChange={setQuantity} />
         <Pressable
-          onPress={() => requireAuth('Cart')}
+          onPress={() => add(product.id, quantity, { moq: product.moq, stock: product.stock })}
+          disabled={isAdding || !inStock}
           accessibilityRole="button"
           className="h-[44px] flex-1 items-center justify-center rounded-full bg-primary active:bg-primary-pressed"
         >
@@ -128,11 +93,12 @@ function ProductBody({ product }: { product: ProductDetail }) {
 
 export function ProductDetailScreen({ uuid }: { uuid: string }) {
   const goBack = useGoBack();
-  const { product, isLoading, error, retry } = useProductDetail(uuid);
+  const cartAction = useCartAction();
+  const { product, isPlaceholder, isLoading, error, retry } = useProductDetail(uuid);
 
   return (
     <View className="flex-1 bg-white">
-      <ListingHeader title="Product" onBack={goBack} />
+      <ListingHeader title="Product" onBack={goBack} actions={[cartAction]} />
       {isLoading ? <LoadingState /> : null}
       {!isLoading && error ? (
         <EmptyState
@@ -151,7 +117,7 @@ export function ProductDetailScreen({ uuid }: { uuid: string }) {
           onAction={goBack}
         />
       ) : null}
-      {product ? <ProductBody key={product.id} product={product} /> : null}
+      {product ? <ProductBody key={`${product.id}:${isPlaceholder}`} product={product} /> : null}
     </View>
   );
 }

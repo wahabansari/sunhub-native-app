@@ -86,20 +86,20 @@ successful responses for five minutes, retains unused results for thirty
 minutes, retries transient failures twice, and exposes `refetch()` for manual
 refresh. See [QUERY.md](QUERY.md) for the required pattern.
 
-| Method | Base       | Path                                                                         | Purpose                 |
-| ------ | ---------- | ---------------------------------------------------------------------------- | ----------------------- |
-| POST   | Main API   | `/client/items/search`                                                       | Fixed-price products    |
-| POST   | Main API   | `/client/brands/search`                                                      | Brand catalog           |
-| GET    | Broker API | `/listing/featured-deals?listing_type=panels`                                | Featured trader deals   |
-| GET    | Broker API | `/broker/sidebar_data?key=homepage`                                          | Pickup-map state counts |
-| GET    | Broker API | `/listing/recent-deals?listing_type=panels`                                  | Recent deals            |
-| GET    | Broker API | `/listing/public/deals?page=1&sort=recommended&homePage=true&isHotDeal=true` | Hot deal                |
-| GET    | WordPress  | `https://www.sunhub.com/blog/wp-json/wp/v2/posts?per_page=6&page=1&_embed`   | Latest articles         |
+| Method | Base       | Path                                                                         | Purpose                   |
+| ------ | ---------- | ---------------------------------------------------------------------------- | ------------------------- |
+| POST   | Main API   | `/client/items/search`                                                       | Fixed-price products      |
+| POST   | Main API   | `/client/brands/search`                                                      | Brand catalog             |
+| GET    | Broker API | `/listing/featured-deals?listing_type=panels`                                | Featured trader deals     |
+| GET    | Broker API | `/broker/sidebar_data?key=homepage`                                          | Local pickup state counts |
+| GET    | Broker API | `/listing/recent-deals?listing_type=panels`                                  | Recent deals              |
+| GET    | Broker API | `/listing/public/deals?page=1&sort=recommended&homePage=true&isHotDeal=true` | Hot deal                  |
+| GET    | WordPress  | `https://www.sunhub.com/blog/wp-json/wp/v2/posts?per_page=6&page=1&_embed`   | Latest articles           |
 
 The broker base is configured with `EXPO_PUBLIC_BROKER_API_BASE_URL` and is called
 with the `/v1` version segment (unversioned broker paths return 404).
-The pickup map reads `data.state.data[{ state, count }]` from `broker/sidebar_data`,
-the same source the web map uses to colour states. Deal images come from
+The local pickup section reads `data.state.data[{ state, count }]` from `broker/sidebar_data`,
+the same source the web page uses for state counts. Deal images come from
 `attachments` (type `Image`) when `images` is empty.
 
 Listing screens add: `POST /client/items/search` (filters via `where`, `where_has` and
@@ -165,6 +165,11 @@ Notes:
 - A rejected response (`status` not `true`) uses the first available message from
   `data.error`, `data.message`, or `data.errors`, with a safe fallback.
 - A 401 is mapped to an invalid-credentials message.
+
+### Cart and checkout
+
+Cart, shipping/tax calculation, FedEx quotes, guest and saved-profile checkout are documented in
+[CART-CHECKOUT.md](CART-CHECKOUT.md).
 
 ### Account flows
 

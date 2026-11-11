@@ -12,6 +12,7 @@ export const env = parseEnv({
   apiVersion: process.env.EXPO_PUBLIC_API_VERSION,
   requestTimeoutMs: process.env.EXPO_PUBLIC_REQUEST_TIMEOUT_MS,
   logLevel: process.env.EXPO_PUBLIC_LOG_LEVEL,
+  stripePublishableKey: process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY,
 });
 
 export type { AppEnv, AppEnvConfig } from './env-schema';

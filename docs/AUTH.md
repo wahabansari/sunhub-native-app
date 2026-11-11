@@ -27,6 +27,7 @@ should not be assumed to be correct for mobile.
 | `/reset-password`  | `ResetPasswordScreen`  | Opened by deep link, or paste the emailed link.                     |
 | `/account`         | `AccountScreen`        | Signed-in summary and sign-out; redirects to login when signed out. |
 
+- Guest cart items move into the account cart after sign-in; see [CART-CHECKOUT.md](CART-CHECKOUT.md).
 - The home header profile button opens `/account` when signed in, else `/login`.
 - `useRequireAuth()` gates chat, offers and cart. It sends signed-out users to
   `/login?redirect=<path>`; after sign-in the login screen redirects there.

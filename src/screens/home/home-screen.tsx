@@ -11,13 +11,15 @@ import { FeaturedDealsSection } from '@/components/home/featured-deals-section';
 import { GrowSection } from '@/components/home/grow-section';
 import { HeroPromo } from '@/components/home/hero-promo';
 import { HomeHeader } from '@/components/home/home-header';
-import { PickupMapSection } from '@/components/home/pickup-map-section';
+import { PickupSection } from '@/components/home/pickup-section';
 import { QuickActions } from '@/components/home/quick-actions';
 import { RecentDealsSection } from '@/components/home/recent-deals-section';
 import { ReviewsSection } from '@/components/home/reviews-section';
 import { SearchBar } from '@/components/home/search-bar';
 import { SpotlightSection } from '@/components/home/spotlight-section';
 import { Reveal } from '@/components/motion/reveal';
+import { useCartCount } from '@/hooks/use-cart';
+import { usePrefetchListings } from '@/hooks/use-prefetch-listings';
 import { useAppReady } from '@/contexts/app-ready/app-ready-context';
 import {
   useBuyDirectProducts,
@@ -50,8 +52,10 @@ export function HomeScreen() {
     scrollRef.current?.scrollTo({ y: Math.max(0, pickupY.current - 8), animated: true });
   }, []);
   const go = useHomeNavigation(scrollToPickup);
+  const cartCount = useCartCount();
 
   const featured = useFeaturedDeals();
+  usePrefetchListings(!featured.isLoading);
   const pickup = usePickupStates();
   const buyDirect = useBuyDirectProducts();
   const recent = useRecentDeals();
@@ -81,7 +85,8 @@ export function HomeScreen() {
         scrollY={scrollY}
         onProfile={go.openProfile}
         onNotifications={() => go.comingSoon('Notifications')}
-        onCart={() => go.comingSoon('Cart')}
+        onCart={go.openCart}
+        cartCount={cartCount}
       />
       <Animated.ScrollView
         ref={scrollRef}
@@ -120,7 +125,7 @@ export function HomeScreen() {
               pickupY.current = event.nativeEvent.layout.y;
             }}
           >
-            <PickupMapSection
+            <PickupSection
               state={pickup}
               onSeeAll={go.openDeals}
               onOpenState={go.openState}

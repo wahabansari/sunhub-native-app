@@ -16,6 +16,8 @@ export interface HomeProduct {
   imageUrl?: string;
   shippingLabel?: string;
   stock?: number;
+  /** Minimum order quantity; 1 when the listing does not set one. */
+  moq?: number;
   sponsorLabel?: string;
   badges: string[];
   brand?: string;

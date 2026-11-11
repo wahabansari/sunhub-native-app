@@ -4,15 +4,16 @@
 
 Copy `.env.example` to `.env.local` for local development.
 
-| Variable                          | Required | Default       | Purpose                                                                  |
-| --------------------------------- | -------- | ------------- | ------------------------------------------------------------------------ |
-| `EXPO_PUBLIC_APP_ENV`             | No       | `development` | `development`, `staging`, or `production`                                |
-| `EXPO_PUBLIC_API_BASE_URL`        | Yes      | none          | API origin, with or without trailing slash                               |
-| `EXPO_PUBLIC_BROKER_API_BASE_URL` | No       | empty         | Broker/listing API origin; homepage deals degrade gracefully when absent |
-| `EXPO_PUBLIC_MEDIA_BASE_URL`      | No       | Sunhub media  | Base URL used to resolve product and deal image paths                    |
-| `EXPO_PUBLIC_API_VERSION`         | No       | `/v1`         | Version path segment                                                     |
-| `EXPO_PUBLIC_REQUEST_TIMEOUT_MS`  | No       | `60000`       | Request timeout, 1–300000 ms                                             |
-| `EXPO_PUBLIC_LOG_LEVEL`           | No       | `warn`        | `debug`, `info`, `warn`, `error`, or `silent`                            |
+| Variable                             | Required | Default       | Purpose                                                                                                                                       |
+| ------------------------------------ | -------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EXPO_PUBLIC_APP_ENV`                | No       | `development` | `development`, `staging`, or `production`                                                                                                     |
+| `EXPO_PUBLIC_API_BASE_URL`           | Yes      | none          | API origin, with or without trailing slash                                                                                                    |
+| `EXPO_PUBLIC_BROKER_API_BASE_URL`    | No       | empty         | Broker/listing API origin; homepage deals degrade gracefully when absent                                                                      |
+| `EXPO_PUBLIC_MEDIA_BASE_URL`         | No       | Sunhub media  | Base URL used to resolve product and deal image paths                                                                                         |
+| `EXPO_PUBLIC_API_VERSION`            | No       | `/v1`         | Version path segment                                                                                                                          |
+| `EXPO_PUBLIC_REQUEST_TIMEOUT_MS`     | No       | `60000`       | Request timeout, 1–300000 ms                                                                                                                  |
+| `EXPO_PUBLIC_LOG_LEVEL`              | No       | `warn`        | `debug`, `info`, `warn`, `error`, or `silent`                                                                                                 |
+| `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` | No       | empty         | Stripe publishable key (`pk_test_…`/`pk_live_…`) for card entry. A secret key is rejected at startup. Without it, card payments are disabled. |
 
 Example:
 

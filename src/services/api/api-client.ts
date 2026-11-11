@@ -91,6 +91,8 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       const method = options.method ?? 'GET';
       const timeoutMs = options.timeoutMs ?? defaultTimeoutMs;
       const url = buildApiUrl(config.baseUrl, apiVersion, options.path);
+      // Query strings can carry addresses and cart ids, so logs only ever get the path.
+      const loggedPath = options.path.split('?')[0];
       const controller = new AbortController();
       const abortFromCaller = () => controller.abort();
       let didTimeout = false;
@@ -129,7 +131,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         }
       }
 
-      logger?.debug('API request', { method, path: options.path });
+      logger?.debug('API request', { method, path: loggedPath });
 
       try {
         const response = await fetchImpl(url, {
@@ -143,7 +145,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           logger?.warn('API request failed', {
             method,
-            path: options.path,
+            path: loggedPath,
             status: response.status,
           });
 
@@ -159,7 +161,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
 
         logger?.debug('API response', {
           method,
-          path: options.path,
+          path: loggedPath,
           status: response.status,
         });
 

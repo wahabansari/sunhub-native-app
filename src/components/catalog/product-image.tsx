@@ -3,19 +3,24 @@ import { Image, View } from 'react-native';
 import { Icon } from '@/components/icons/icon';
 import { colors } from '@/theme/tokens';
 
+const PLAIN_STYLE = { width: '100%', height: '100%' } as const;
+const BLEND_STYLE = { ...PLAIN_STYLE, mixBlendMode: 'multiply' } as const;
+
 type Props = {
   uri?: string;
   label: string;
   /** Space kept around the picture; `top` leaves room for a badge. */
   inset?: { top?: number; x?: number; bottom?: number };
   fallbackSize?: number;
+  /** Multiplies the photo into a grey tile so white photo backgrounds vanish; unnecessary on white tiles. */
+  blend?: boolean;
 };
 
 /**
  * Fills its (relatively positioned) parent and fits the picture inside it without distortion.
  * The picture multiplies with the tile colour, so white photo backgrounds disappear.
  */
-export function ProductImage({ uri, label, inset, fallbackSize = 36 }: Props) {
+export function ProductImage({ uri, label, inset, fallbackSize = 36, blend = true }: Props) {
   const padding = {
     paddingTop: inset?.top ?? 10,
     paddingHorizontal: inset?.x ?? 10,
@@ -27,8 +32,10 @@ export function ProductImage({ uri, label, inset, fallbackSize = 36 }: Props) {
       {uri ? (
         <Image
           source={{ uri }}
-          style={{ width: '100%', height: '100%', mixBlendMode: 'multiply' }}
+          style={blend ? BLEND_STYLE : PLAIN_STYLE}
           resizeMode="contain"
+          resizeMethod="resize"
+          fadeDuration={150}
           accessibilityLabel={label}
         />
       ) : (

@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -19,9 +19,10 @@ type ButtonProps = {
   label: string;
   onPress?: () => void;
   showDot?: boolean;
+  badge?: number;
 };
 
-function HeaderButton({ icon, label, onPress, showDot = false }: ButtonProps) {
+function HeaderButton({ icon, label, onPress, showDot = false, badge = 0 }: ButtonProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -30,6 +31,13 @@ function HeaderButton({ icon, label, onPress, showDot = false }: ButtonProps) {
       className="h-10 w-10 items-center justify-center rounded-full active:bg-chip"
     >
       <Icon name={icon} size={22} color={colors.ink} />
+      {badge ? (
+        <View className="absolute right-[2px] top-[3px] h-[16px] min-w-[16px] items-center justify-center rounded-full bg-primary px-[4px]">
+          <Text className="font-inter-bold text-[10px] leading-[14px] text-white">
+            {badge > 99 ? '99+' : badge}
+          </Text>
+        </View>
+      ) : null}
       {showDot ? (
         <View className="absolute right-[11px] top-[10px] h-[13px] w-[13px] rounded-full border-2 border-white bg-primary" />
       ) : null}
@@ -44,6 +52,7 @@ type Props = {
   onProfile?: () => void;
   onNotifications?: () => void;
   onCart?: () => void;
+  cartCount?: number;
 };
 
 export function HomeHeader({
@@ -52,6 +61,7 @@ export function HomeHeader({
   onProfile,
   onNotifications,
   onCart,
+  cartCount = 0,
 }: Props) {
   const insets = useSafeAreaInsets();
 
@@ -86,7 +96,7 @@ export function HomeHeader({
           onPress={onNotifications}
           showDot={hasUnreadNotifications}
         />
-        <HeaderButton icon="cart" label="Cart" onPress={onCart} />
+        <HeaderButton icon="cart" label="Cart" onPress={onCart} badge={cartCount} />
       </View>
     </Animated.View>
   );

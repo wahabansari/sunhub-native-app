@@ -1,6 +1,6 @@
 import type { DealFilters, FilterSelection, ProductFilters } from '@/types/listing';
 
-export const LISTING_PAGE_SIZE = 20;
+export const LISTING_PAGE_SIZE = 12;
 
 const PRODUCT_LIST_FIELDS = [
   'id',

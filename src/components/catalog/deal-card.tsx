@@ -6,6 +6,8 @@ import { PressableScale } from '@/components/motion/pressable-scale';
 import type { HomeDeal } from '@/types/home';
 import { dealPrice, formatMoney, formatPerWatt, moqLabel } from '@/utils/home-format';
 
+const ISOLATE = { isolation: 'isolate' } as const;
+
 type Props = {
   deal: HomeDeal;
   onPress?: () => void;
@@ -35,9 +37,14 @@ export function DealCard({ deal, onPress, tone = 'gray' }: Props) {
         className={`aspect-[1/0.9] overflow-hidden rounded-[14px] ${
           tone === 'white' ? 'border border-hairline bg-white' : 'bg-chip'
         }`}
-        style={{ isolation: 'isolate' }}
+        style={tone === 'gray' ? ISOLATE : undefined}
       >
-        <ProductImage uri={deal.imageUrl} label={deal.name} inset={{ top: 28, bottom: 8 }} />
+        <ProductImage
+          uri={deal.imageUrl}
+          label={deal.name}
+          inset={{ top: 28, bottom: 8 }}
+          blend={tone === 'gray'}
+        />
         {deal.sponsored ? <SponsoredBadge /> : null}
       </View>
       <View className="gap-[4px] px-[2px] pt-[6px]">

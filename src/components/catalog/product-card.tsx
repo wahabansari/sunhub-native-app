@@ -60,25 +60,27 @@ export function ProductCard({ product, onPress, onAdd, layout = 'half' }: Props)
         >
           {product.name}
         </Text>
-        <Text
-          className={`font-inter-medium text-[12px] ${inStock ? 'text-[#15803D]' : 'text-muted'}`}
-        >
-          {inStock ? 'In stock' : 'Out of stock'}
-        </Text>
-        <View className="flex-row items-center justify-between gap-[6px]">
-          <Text className="flex-1 font-inter-bold text-[17px] text-ink" numberOfLines={1}>
-            {formatMoney(product.price)}
-            <Text className="font-inter-medium text-[11px] text-muted"> / {product.unit}</Text>
-          </Text>
-          <Pressable
-            onPress={onAdd}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={`Add ${product.name} to cart`}
-            className="h-[26px] w-[26px] items-center justify-center rounded-full bg-primary active:bg-primary-pressed"
+        <View className="gap-[1px]">
+          <Text
+            className={`font-inter-medium text-[12px] ${inStock ? 'text-[#15803D]' : 'text-muted'}`}
           >
-            <Icon name="plus" size={14} color={colors.onPrimary} strokeWidth={2.6} />
-          </Pressable>
+            {inStock ? 'In stock' : 'Out of stock'}
+          </Text>
+          <View className="flex-row items-center justify-between gap-[6px]">
+            <Text className="flex-1 font-inter-bold text-[17px] text-ink" numberOfLines={1}>
+              {formatMoney(product.price)}
+              <Text className="font-inter-medium text-[11px] text-muted"> / {product.unit}</Text>
+            </Text>
+            <Pressable
+              onPress={onAdd}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={`Add ${product.name} to cart`}
+              className="h-[26px] w-[26px] items-center justify-center rounded-full bg-primary active:bg-primary-pressed"
+            >
+              <Icon name="plus" size={14} color={colors.onPrimary} strokeWidth={2.6} />
+            </Pressable>
+          </View>
         </View>
       </View>
     </PressableScale>

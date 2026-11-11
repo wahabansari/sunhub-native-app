@@ -4,6 +4,7 @@ import { Linking } from 'react-native';
 
 import { showComingSoon } from '@/components/feedback/notices';
 import { useAuth } from '@/hooks/use-auth';
+import { useAddToCart } from '@/hooks/use-cart';
 import { useRequireAuth } from '@/hooks/use-require-auth';
 import type { QUICK_ACTIONS } from '@/constants/home-content';
 import type { HomeArticle, HomeBrand, HomeCategory, HomeDeal, HomeProduct } from '@/types/home';
@@ -20,6 +21,7 @@ function openExternal(url: string): void {
 export function useHomeNavigation(scrollToPickup: () => void) {
   const router = useRouter();
   const requireAuth = useRequireAuth();
+  const { add } = useAddToCart();
   const { state } = useAuth();
   const isSignedIn = state.status === 'authenticated';
 
@@ -46,9 +48,11 @@ export function useHomeNavigation(scrollToPickup: () => void) {
       },
       openProfile: () => router.push(isSignedIn ? '/account' : '/login'),
       chat: () => requireAuth('Chat'),
-      addToCart: () => requireAuth('Cart'),
+      openCart: () => router.push('/cart'),
+      addToCart: (product: HomeProduct) =>
+        add(product.id, product.moq ?? 1, { moq: product.moq, stock: product.stock }),
       comingSoon: showComingSoon,
     }),
-    [isSignedIn, router, requireAuth, scrollToPickup],
+    [add, isSignedIn, router, requireAuth, scrollToPickup],
   );
 }

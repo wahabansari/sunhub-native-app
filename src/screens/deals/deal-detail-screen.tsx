@@ -159,7 +159,7 @@ function DealBody({ deal }: { deal: DealDetail }) {
 
 export function DealDetailScreen({ listingId }: { listingId: string }) {
   const goBack = useGoBack();
-  const { deal, isLoading, error, retry } = useDealDetail(listingId);
+  const { deal, isPlaceholder, isLoading, error, retry } = useDealDetail(listingId);
 
   return (
     <View className="flex-1 bg-white">
@@ -182,7 +182,7 @@ export function DealDetailScreen({ listingId }: { listingId: string }) {
           onAction={goBack}
         />
       ) : null}
-      {deal ? <DealBody key={deal.id} deal={deal} /> : null}
+      {deal ? <DealBody key={`${deal.id}:${isPlaceholder}`} deal={deal} /> : null}
     </View>
   );
 }

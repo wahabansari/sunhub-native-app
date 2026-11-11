@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from 'react-native';
 
-import { Bone } from '@/components/motion/bone';
+import { Bone, SkeletonPulse } from '@/components/motion/bone';
 import type { SectionState } from '@/hooks/use-home-sections';
 
 export type SkeletonKind = 'cards' | 'list' | 'block';
@@ -54,7 +54,13 @@ type Props = {
 
 /** Stands in for a section's content while it loads, after it fails, or when it is empty. */
 export function SectionPlaceholder({ state, emptyText, kind = 'cards', height = 160 }: Props) {
-  if (state.isLoading) return <Skeleton kind={kind} height={height} />;
+  if (state.isLoading) {
+    return (
+      <SkeletonPulse>
+        <Skeleton kind={kind} height={height} />
+      </SkeletonPulse>
+    );
+  }
 
   if (state.error) {
     return (

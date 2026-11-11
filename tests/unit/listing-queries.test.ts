@@ -31,7 +31,7 @@ describe('listing queries', () => {
       ['status', 'approved'],
     ]);
     expect(body.where_in).toEqual([]);
-    expect(body).toMatchObject({ page: 2, limit: 20 });
+    expect(body).toMatchObject({ page: 2, limit: 12 });
     expect(body).not.toHaveProperty('where_has');
     expect(body).not.toHaveProperty('availability');
   });
@@ -89,7 +89,7 @@ describe('listing queries', () => {
   });
 
   it('encodes deal query values and skips empty filters', () => {
-    expect(buildDealQuery({}, 1)).toBe('limit=20&page=1');
+    expect(buildDealQuery({}, 1)).toBe('limit=12&page=1');
     expect(
       buildDealQuery(
         {
@@ -111,7 +111,7 @@ describe('listing queries', () => {
         3,
       ),
     ).toBe(
-      'limit=20&page=3&listing_type=panels&sub_category=Bifacial&brand=Trina%20Solar' +
+      'limit=12&page=3&listing_type=panels&sub_category=Bifacial&brand=Trina%20Solar' +
         '&condition=new%2Cpre%20owned&state=CA%2CTX&incoterms=EXW&colors=Black&wattage=400%2C495' +
         '&company_tier=Tier%201&availability=1&cec_listed=true&feoc_compliant=true&search=a%26b%3Dc',
     );

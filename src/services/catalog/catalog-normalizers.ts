@@ -215,6 +215,7 @@ export function normalizeProduct(value: RecordValue, index: number): HomeProduct
     imageUrl: firstImage(value.images),
     shippingLabel: shippingLabel(value.shipping_type),
     stock: numberValue(value.total_qty, 0),
+    moq: Math.max(1, numberValue(value.moq, 1)),
     sponsorLabel: sponsorLabel(value),
     badges: complianceBadges(value),
     brand: stringValue(brand.name),

@@ -1,18 +1,13 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter, type useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
 
 import { ProductCard } from '@/components/catalog/product-card';
-import { showComingSoon } from '@/components/feedback/notices';
 import { FilterSheet } from '@/components/listing/filter-sheet';
-import { ListingHeader } from '@/components/listing/listing-header';
-import { ModeBar } from '@/components/listing/mode-bar';
 import { ResultGrid } from '@/components/listing/result-grid';
 import { HOME_CATEGORIES } from '@/constants/home-content';
-import { useGoBack } from '@/hooks/use-go-back';
 import { useProductFilterData } from '@/hooks/use-listing-options';
 import { useProductList } from '@/hooks/use-product-list';
-import { useRequireAuth } from '@/hooks/use-require-auth';
+import { useAddToCart } from '@/hooks/use-cart';
 import type { ProductFilters } from '@/types/listing';
 import {
   countSelected,
@@ -21,15 +16,19 @@ import {
   productSections,
 } from '@/utils/listing-filters';
 
-export function ProductListScreen() {
+import type { MarketplacePane } from './marketplace-pane';
+
+/** The "Buy now" half of the marketplace page: its own filters, list and filter sheet. */
+export function useProductsPane(
+  params: ReturnType<typeof useLocalSearchParams>,
+  active: boolean,
+): MarketplacePane {
   const router = useRouter();
-  const goBack = useGoBack();
-  const requireAuth = useRequireAuth();
-  const params = useLocalSearchParams();
+  const { add } = useAddToCart();
   const [filters, setFilters] = useState<ProductFilters>(() => parseProductParams(params));
   const [sheetKey, setSheetKey] = useState<number | null>(null);
   const filterData = useProductFilterData();
-  const list = useProductList(filters);
+  const list = useProductList(filters, active);
 
   const selection = filters.selection ?? {};
   const filterCount = countSelected(selection);
@@ -40,27 +39,12 @@ export function ProductListScreen() {
     list.total === 1 ? 'product' : 'products'
   }${category ? ` in ${category.name}` : ''}${filters.search ? ` for “${filters.search}”` : ''}`;
 
-  return (
-    <View className="flex-1 bg-white">
-      <ListingHeader
-        title={category?.name ?? 'All products'}
-        onBack={goBack}
-        actions={[
-          { icon: 'search', label: 'Search', onPress: () => router.push('/search') },
-          { icon: 'cart', label: 'Cart', onPress: () => showComingSoon('Cart') },
-        ]}
-      />
-      <ModeBar
-        mode="buy"
-        onModeChange={() =>
-          router.replace({
-            pathname: '/deals',
-            params: filters.search ? { q: filters.search } : {},
-          })
-        }
-        activeFilterCount={filterCount}
-        onOpenFilters={() => setSheetKey(Date.now())}
-      />
+  return {
+    title: category?.name ?? 'All products',
+    isLoading: list.isLoading,
+    filterCount,
+    openFilters: () => setSheetKey(Date.now()),
+    grid: (
       <ResultGrid
         data={list.items}
         keyOf={(product) => product.id}
@@ -69,7 +53,9 @@ export function ProductListScreen() {
             layout="fluid"
             product={product}
             onPress={() => router.push(`/products/${product.id}`)}
-            onAdd={() => requireAuth('Cart')}
+            onAdd={() =>
+              add(product.id, product.moq ?? 1, { moq: product.moq, stock: product.stock })
+            }
           />
         )}
         countLabel={countLabel}
@@ -83,7 +69,9 @@ export function ProductListScreen() {
         onLoadMore={list.loadMore}
         onRefresh={list.refresh}
       />
-      {sheetKey !== null ? (
+    ),
+    sheet:
+      sheetKey !== null ? (
         <FilterSheet
           key={sheetKey}
           selection={selection}
@@ -95,7 +83,6 @@ export function ProductListScreen() {
             setSheetKey(null);
           }}
         />
-      ) : null}
-    </View>
-  );
+      ) : null,
+  };
 }

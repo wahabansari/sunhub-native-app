@@ -1,5 +1,5 @@
-import { ProductListScreen } from '@/screens/products/product-list-screen';
+import { MarketplaceScreen } from '@/screens/marketplace/marketplace-screen';
 
 export default function Products() {
-  return <ProductListScreen />;
+  return <MarketplaceScreen initialMode="buy" />;
 }

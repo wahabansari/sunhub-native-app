@@ -103,6 +103,8 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
       };
 
     case 'CLEAR_ERROR':
+      // Returning the same state skips a re-render of every screen that reads the session.
+      if (state.error === null && state.errorCode === null) return state;
       return {
         ...state,
         error: null,

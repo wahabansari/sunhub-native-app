@@ -16,6 +16,7 @@ export interface EnvSource {
   apiVersion?: string;
   requestTimeoutMs?: string;
   logLevel?: string;
+  stripePublishableKey?: string;
 }
 
 export interface AppEnvConfig {
@@ -27,6 +28,8 @@ export interface AppEnvConfig {
   apiVersion: string;
   requestTimeoutMs: number;
   logLevel: LogLevel;
+  /** Stripe publishable key (`pk_…`); empty when card payments are not configured. */
+  stripePublishableKey: string;
 }
 
 export class ConfigError extends Error {
@@ -103,6 +106,24 @@ function parseTimeout(value: string | undefined): number {
   return parsed;
 }
 
+/**
+ * The key is bundled into the app, so only a publishable key is ever accepted. A secret key
+ * (`sk_…`) here would be public to everyone who installs the app, so it is rejected outright.
+ */
+function parseStripeKey(value: string | undefined): string {
+  const normalized = value?.trim() ?? '';
+
+  if (!normalized) return '';
+
+  if (!/^pk_(test|live)_[A-Za-z0-9]+$/.test(normalized)) {
+    throw new ConfigError(
+      'EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY must be a Stripe publishable key (pk_test_… or pk_live_…).',
+    );
+  }
+
+  return normalized;
+}
+
 function parseLogLevel(value: string | undefined): LogLevel {
   const normalized = (value ?? 'warn').trim().toLowerCase() as LogLevel;
 
@@ -127,5 +148,6 @@ export function parseEnv(source: EnvSource): AppEnvConfig {
     apiVersion: parseApiVersion(source.apiVersion),
     requestTimeoutMs: parseTimeout(source.requestTimeoutMs),
     logLevel: parseLogLevel(source.logLevel),
+    stripePublishableKey: parseStripeKey(source.stripePublishableKey),
   };
 }

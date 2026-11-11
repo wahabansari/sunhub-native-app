@@ -208,7 +208,7 @@ export function SearchScreen() {
                 );
               })}
             </View>
-            {searching ? <LoadingState label="Searching…" /> : null}
+            {searching ? <LoadingState /> : null}
             {showDeals ? (
               <>
                 <Text className="px-md pb-[6px] pt-sm font-poppins-semibold text-[15px] text-ink">

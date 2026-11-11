@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const STEP_MS = 70;
-const MAX_STAGGER = 6;
+/** Sections below the first screen skip the entrance animation: nobody sees it, and it costs a layout animation each. */
+const ANIMATED_SECTIONS = 3;
 const DURATION_MS = 480;
 
 type Props = {
@@ -12,7 +13,9 @@ type Props = {
 };
 
 export function Reveal({ children, index = 0 }: Props) {
-  const delay = Math.min(index, MAX_STAGGER) * STEP_MS;
+  if (index >= ANIMATED_SECTIONS) return <>{children}</>;
+
+  const delay = index * STEP_MS;
 
   return (
     <Animated.View entering={FadeInDown.delay(delay).duration(DURATION_MS)}>

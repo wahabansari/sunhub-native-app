@@ -33,7 +33,7 @@ describe('deal service', () => {
     const page = await searchDeals({ selection: { state: ['CA'], brand: ['Trina Solar'] } }, 2);
 
     expect(mocks.brokerRequest).toHaveBeenCalledWith({
-      path: 'listing/public/deals?limit=20&page=2&brand=Trina%20Solar&state=CA',
+      path: 'listing/public/deals?limit=12&page=2&brand=Trina%20Solar&state=CA',
     });
     expect(page).toMatchObject({ total: 43, page: 2, hasMore: true });
     expect(page.items[0]).toMatchObject({ id: 'D1', pricePerWatt: 0.2 });

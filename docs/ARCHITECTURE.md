@@ -131,7 +131,8 @@ draft; do not duplicate React Query data in Context.
   parts) and `src/components/catalog/` (cards, product image). Product and deal
   data flow through `src/services/catalog/` (queries, normalizers, detail
   mappers) and the hooks in `src/hooks/use-*-list.ts` / `use-*-detail.ts`.
-- Actions that need an account (chat, offers, cart) go through
+- Adding to the cart works for guests and signed-in buyers (see
+  [CART-CHECKOUT.md](CART-CHECKOUT.md)); chat and offers still go through
   `useRequireAuth()` (`src/hooks/use-require-auth.ts`): signed-in users run the
   action (or see the feature's coming-soon notice while it is unbuilt), everyone
   else is sent to `/login?redirect=<current path>` and returned afterwards. There
@@ -148,8 +149,15 @@ string[]>`) shared by route params, the sheet and the API query builders. The
 - Animation uses `react-native-reanimated` only: `components/motion/` holds the
   press-scale and staggered-reveal primitives, the home header shadow follows the
   scroll offset, and `components/splash/animated-splash.tsx` plays over the native
-  splash until the home screen has loaded. The pickup map pans and pinch-zooms
-  with `react-native-gesture-handler`.
+  splash until the home screen has loaded.
+- Performance rules: skeletons share one pulse (`SkeletonPulse`) instead of one
+  animation per block; only the first three home sections animate in; list
+  images use `resizeMethod="resize"` and only grey tiles pay for the multiply
+  blend; the Stack uses `freezeOnBlur`; the React Compiler is enabled
+  (`experiments.reactCompiler`); detail screens show the card's summary from the
+  query cache (`findCachedItem`) while the full record loads; after the home
+  page has content, `usePrefetchListings` warms the first product and deal
+  pages. Judge smoothness on a release build, not Expo Go or a dev client.
 
 ## Auth state
 
@@ -279,7 +287,9 @@ See [STYLING.md](STYLING.md) for tokens, conventions, and testing notes.
   (+ `/deals/[listingId]`). List routes read filters from query params
   (`category`, `brand`, `cec_listed`, `feoc_compliant`, `type`, `state`,
   `condition`, `q`), validated in `src/utils/listing-filters.ts`.
-  Auth routes: `/login`, `/register`, `/forgot-password`, `/reset-password`
+  Buy now and Negotiable are one page (`MarketplaceScreen`): the mode switch only slides the
+  selector and swaps the title and results. Commerce routes: `/cart`, `/checkout`,
+  `/order-confirmation`. Auth routes: `/login`, `/register`, `/forgot-password`, `/reset-password`
   (also the `sunhub://reset-password?email=…&token=…` deep link) and `/account`;
   see [AUTH.md](AUTH.md).
 - **New API endpoints:** add the path to `src/constants/api.ts`, add a typed

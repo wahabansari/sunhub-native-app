@@ -16,7 +16,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.sunhubnativedashapp"
     },
     "web": {
       "bundler": "metro",
@@ -31,8 +32,12 @@
           "imageWidth": 200
         }
       ],
-      "expo-router"
+      "expo-router",
+      ["@stripe/stripe-react-native", {}]
     ],
-    "scheme": "sunhub"
+    "scheme": "sunhub",
+    "experiments": {
+      "reactCompiler": true
+    }
   }
 }
