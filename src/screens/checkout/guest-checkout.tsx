@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { AddressFields } from '@/components/checkout/address-fields';
-import { CardInput, isCardEntryAvailable } from '@/components/checkout/card-input';
+import { CardInput } from '@/components/checkout/card-input';
 import { CheckboxRow } from '@/components/forms/checkbox-row';
 import { TextField } from '@/components/forms/text-field';
 import { useToast } from '@/components/feedback/toast';
@@ -10,6 +10,7 @@ import { sameAddress, useCheckoutPricing } from '@/hooks/use-checkout-pricing';
 import { useCardTokenizer } from '@/hooks/use-card-tokenizer';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { checkoutService } from '@/services/cart';
+import { isCardEntryAvailable } from '@/services/payments/stripe';
 import type { Cart, GuestContact, ShippingAddress } from '@/types/cart';
 import { formatUsPhone } from '@/utils/auth-links';
 import {
@@ -53,7 +54,7 @@ export function GuestCheckout({ cart }: { cart: Cart }) {
   const { order, totals } = pricing;
 
   const submit = () => {
-    if (!isCardEntryAvailable) {
+    if (!isCardEntryAvailable()) {
       toast.show('Card payments are not available in this build.', 'error');
       return;
     }
@@ -107,6 +108,7 @@ export function GuestCheckout({ cart }: { cart: Cart }) {
       <Section title="Contact">
         <TextField
           label="First name"
+          placeholder="Enter your first name"
           icon="user"
           required
           value={contact.firstName}
@@ -118,6 +120,7 @@ export function GuestCheckout({ cart }: { cart: Cart }) {
         />
         <TextField
           label="Last name"
+          placeholder="Enter your last name"
           icon="user"
           required
           value={contact.lastName}
@@ -129,6 +132,7 @@ export function GuestCheckout({ cart }: { cart: Cart }) {
         />
         <TextField
           label="Email"
+          placeholder="name@example.com"
           icon="mail"
           required
           value={contact.email}
@@ -165,6 +169,7 @@ export function GuestCheckout({ cart }: { cart: Cart }) {
       <Section title="Payment">
         <TextField
           label="Name on card"
+          placeholder="Name as shown on the card"
           icon="user"
           required
           value={holder}
@@ -175,7 +180,7 @@ export function GuestCheckout({ cart }: { cart: Cart }) {
           autoCapitalize="words"
         />
         <CardInput onCompleteChange={setCardComplete} disabled={order.isPlacing} />
-        {errors.card && isCardEntryAvailable ? (
+        {errors.card && isCardEntryAvailable() ? (
           <Text className="font-inter text-[12.5px] text-danger">{errors.card}</Text>
         ) : null}
         <CheckboxRow checked={sameBilling} onToggle={() => setSameBilling((value) => !value)}>

@@ -1,4 +1,3 @@
-import { StripeProvider } from '@stripe/stripe-react-native';
 import type { ErrorInfo, ReactNode } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -7,6 +6,7 @@ import { ToastProvider } from '@/components/feedback/toast';
 import { env } from '@/config/env';
 import { AuthProvider } from '@/contexts/auth';
 import { authService } from '@/services/auth';
+import { getStripe } from '@/services/payments/stripe';
 import { logger } from '@/services/logging';
 
 import { CartSync } from './cart-sync';
@@ -18,7 +18,10 @@ function handleUiError(error: Error, _info: ErrorInfo): void {
 
 /** Card entry is only available when a Stripe publishable key is configured. */
 function Payments({ children }: { children: ReactNode }) {
-  if (!env.stripePublishableKey) return <>{children}</>;
+  const stripe = env.stripePublishableKey ? getStripe() : null;
+  if (!stripe) return <>{children}</>;
+
+  const { StripeProvider } = stripe;
   return (
     <StripeProvider publishableKey={env.stripePublishableKey}>
       <>{children}</>

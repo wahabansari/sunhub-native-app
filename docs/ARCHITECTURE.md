@@ -288,7 +288,7 @@ See [STYLING.md](STYLING.md) for tokens, conventions, and testing notes.
   (`category`, `brand`, `cec_listed`, `feoc_compliant`, `type`, `state`,
   `condition`, `q`), validated in `src/utils/listing-filters.ts`.
   Buy now and Negotiable are one page (`MarketplaceScreen`): the mode switch only slides the
-  selector and swaps the title and results. Commerce routes: `/cart`, `/checkout`,
+  selector and swaps the title and results. Account routes (`/account`, `/account/orders|listings|sales|addresses|cards|settings`) show sections by role: buyers (`customer`), sellers (`seller`), or both; the server stays authoritative. Cached per-user data is cleared on sign-out. Commerce routes: `/cart`, `/checkout`,
   `/order-confirmation`. Auth routes: `/login`, `/register`, `/forgot-password`, `/reset-password`
   (also the `sunhub://reset-password?email=…&token=…` deep link) and `/account`;
   see [AUTH.md](AUTH.md).

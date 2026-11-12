@@ -50,6 +50,7 @@ export function TextField({
           {...inputProps}
           ref={inputRef}
           secureTextEntry={secret && !revealed}
+          placeholder={inputProps.placeholder ?? `Enter ${label.toLowerCase()}`}
           placeholderTextColor={colors.faint}
           accessibilityLabel={label}
           autoCorrect={false}

@@ -16,3 +16,14 @@ export function isCustomer(roles: readonly string[]): boolean {
 export function isReseller(roles: readonly string[]): boolean {
   return hasRole(roles, USER_ROLES.reseller);
 }
+
+/** What to call a signed-in user's role set: Buyer, Seller, or Buyer & Seller. */
+export function roleLabel(roles: readonly string[]): string {
+  const buyer = isCustomer(roles);
+  const seller = isSeller(roles);
+
+  if (buyer && seller) return 'Buyer & Seller';
+  if (seller) return 'Seller';
+  if (buyer) return 'Buyer';
+  return 'Member';
+}

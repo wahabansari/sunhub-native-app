@@ -7,6 +7,9 @@ import { cartService } from '@/services/cart';
 import { logger } from '@/services/logging';
 
 /**
+ * Signing out also discards every cached per-user list (account, saved profile, checkout) so the
+ * next person on this device never sees the previous user's data.
+ *
  * When a buyer signs in, items they added as a guest move into their account cart, then every
  * cart view refreshes. Renders nothing.
  */
@@ -17,6 +20,9 @@ export function CartSync() {
 
   useEffect(() => {
     if (!signedIn) {
+      client.removeQueries({ queryKey: ['account'] });
+      client.removeQueries({ queryKey: ['profile'] });
+      client.removeQueries({ queryKey: ['checkout'] });
       void client.invalidateQueries({ queryKey: queryKeys.cart });
       return undefined;
     }

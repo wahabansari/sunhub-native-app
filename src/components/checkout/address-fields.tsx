@@ -24,6 +24,7 @@ export function AddressFields({ value, onChange, errors = {}, kind }: Props) {
     <View className="gap-[16px]">
       <TextField
         label="Street address"
+        placeholder="Street and number"
         icon="pin"
         required
         value={value.address}
@@ -35,6 +36,7 @@ export function AddressFields({ value, onChange, errors = {}, kind }: Props) {
       />
       <TextField
         label="City"
+        placeholder="Enter your city"
         icon="building"
         required
         value={value.city}
@@ -50,6 +52,7 @@ export function AddressFields({ value, onChange, errors = {}, kind }: Props) {
       />
       <TextField
         label="ZIP code"
+        placeholder="5-digit ZIP code"
         icon="pin"
         required
         value={value.zip}

@@ -19,13 +19,16 @@ should not be assumed to be correct for mobile.
 
 ## Screens and flow
 
-| Route              | Screen                 | Notes                                                               |
-| ------------------ | ---------------------- | ------------------------------------------------------------------- |
-| `/login`           | `LoginScreen`          | Email + password. `?redirect=` returns to the screen that asked.    |
-| `/register`        | `RegisterScreen`       | Buyer/Seller/Both, then a "check your email" confirmation.          |
-| `/forgot-password` | `ForgotPasswordScreen` | Sends the reset email, then offers "I have my reset link".          |
-| `/reset-password`  | `ResetPasswordScreen`  | Opened by deep link, or paste the emailed link.                     |
-| `/account`         | `AccountScreen`        | Signed-in summary and sign-out; redirects to login when signed out. |
+| Route                                                       | Screen                                             | Notes                                                                              |
+| ----------------------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `/login`                                                    | `LoginScreen`                                      | Email + password. `?redirect=` returns to the screen that asked.                   |
+| `/register`                                                 | `RegisterScreen`                                   | Buyer/Seller/Both, then a "check your email" confirmation.                         |
+| `/forgot-password`                                          | `ForgotPasswordScreen`                             | Sends the reset email, then offers "I have my reset link".                         |
+| `/reset-password`                                           | `ResetPasswordScreen`                              | Opened by deep link, or paste the emailed link.                                    |
+| `/account`                                                  | `AccountHubScreen`                                 | Role-aware home: Buying (buyers), Selling (sellers), Account (everyone), sign-out. |
+| `/account/orders`                                           | `OrdersScreen`                                     | Buyers: purchase history.                                                          |
+| `/account/listings`, `/account/sales`                       | `ListingsScreen`, `SoldItemsScreen`                | Sellers: own products and sold orders.                                             |
+| `/account/addresses`, `/account/cards`, `/account/settings` | saved addresses, saved cards, profile and password | Every role.                                                                        |
 
 - Guest cart items move into the account cart after sign-in; see [CART-CHECKOUT.md](CART-CHECKOUT.md).
 - The home header profile button opens `/account` when signed in, else `/login`.

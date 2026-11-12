@@ -1,9 +1,9 @@
-import { CardField } from '@stripe/stripe-react-native';
 import { Text, View } from 'react-native';
 
 import { FormBanner } from '@/components/forms/form-banner';
 import { Icon } from '@/components/icons/icon';
 import { env } from '@/config/env';
+import { getStripe, isCardEntryAvailable } from '@/services/payments/stripe';
 import { colors } from '@/theme/tokens';
 
 type Props = {
@@ -12,21 +12,25 @@ type Props = {
   disabled?: boolean;
 };
 
-export const isCardEntryAvailable = Boolean(env.stripePublishableKey);
-
 /**
  * Stripe's native card field. The card number, expiry and CVC are typed into native memory owned by
  * Stripe's SDK; this component only learns whether the card looks complete, never its contents.
  */
 export function CardInput({ onCompleteChange, disabled = false }: Props) {
-  if (!isCardEntryAvailable) {
+  const stripe = isCardEntryAvailable() ? getStripe() : null;
+  if (!stripe) {
     return (
       <FormBanner
         tone="info"
-        message="Card payments are not set up in this build yet. Add EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY to enable them."
+        message={
+          env.stripePublishableKey
+            ? 'Card payments are not available in this version of the app. Use a development build to pay by card.'
+            : 'Card payments are not set up in this build yet. Add EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY to enable them.'
+        }
       />
     );
   }
+  const { CardField } = stripe;
 
   return (
     <View className="gap-[8px]">

@@ -49,6 +49,7 @@ export function AddAddressForm({ email, defaultName, onDone, onCancel }: Props) 
     <View className="gap-[16px] rounded-[16px] border border-[#EEF0F3] p-md">
       <TextField
         label="Name"
+        placeholder="e.g. Home or Office"
         icon="user"
         required
         value={name}

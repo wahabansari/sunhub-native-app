@@ -59,6 +59,7 @@ export function AddCardForm({ shipping, onDone, onCancel }: Props) {
     <View className="gap-[16px] rounded-[16px] border border-[#EEF0F3] p-md">
       <TextField
         label="Name on card"
+        placeholder="Name as shown on the card"
         icon="user"
         required
         value={holder}

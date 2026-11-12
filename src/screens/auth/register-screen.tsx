@@ -111,6 +111,7 @@ export function RegisterScreen() {
       <RolePicker value={form.role} onChange={changeRole} />
       <TextField
         label="Full Name"
+        placeholder="Enter your full name"
         icon="user"
         required
         value={form.fullName}
@@ -123,6 +124,7 @@ export function RegisterScreen() {
       {showCompany ? (
         <TextField
           label="Company Name"
+          placeholder="Company name (optional)"
           icon="building"
           value={form.companyName}
           onChangeText={(value) => update('companyName', value)}
@@ -132,6 +134,7 @@ export function RegisterScreen() {
       ) : null}
       <TextField
         label="Email Address"
+        placeholder="Enter your email address"
         icon="mail"
         required
         value={form.email}
@@ -157,6 +160,7 @@ export function RegisterScreen() {
       />
       <TextField
         label="Password"
+        placeholder="Create a password"
         icon="lock"
         required
         secret
@@ -169,6 +173,7 @@ export function RegisterScreen() {
       />
       <TextField
         label="Confirm Password"
+        placeholder="Re-enter your password"
         icon="lock"
         required
         secret

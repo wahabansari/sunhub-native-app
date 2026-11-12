@@ -88,6 +88,7 @@ export function ResetPasswordScreen() {
       ) : (
         <TextField
           label="Email Address"
+          placeholder="Enter your email address"
           icon="mail"
           value={email}
           editable={false}

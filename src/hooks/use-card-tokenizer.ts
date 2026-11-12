@@ -1,8 +1,8 @@
-import { createToken } from '@stripe/stripe-react-native';
 import { useCallback } from 'react';
 
 import { AppError } from '@/errors/app-error';
 import type { CardToken } from '@/services/cart';
+import { getStripe } from '@/services/payments/stripe';
 
 /**
  * Turns the card typed into Stripe's native `CardField` into a single-use token. The number,
@@ -11,7 +11,13 @@ import type { CardToken } from '@/services/cart';
  */
 export function useCardTokenizer() {
   return useCallback(async (holderName: string): Promise<CardToken> => {
-    const { token, error } = await createToken({ type: 'Card', name: holderName.trim() });
+    const stripe = getStripe();
+    if (!stripe) {
+      throw new AppError('CHECKOUT_FAILED', 'Stripe is not available', {
+        userMessage: 'Card payments are not available in this version of the app.',
+      });
+    }
+    const { token, error } = await stripe.createToken({ type: 'Card', name: holderName.trim() });
 
     if (error || !token?.card) {
       throw new AppError('CHECKOUT_FAILED', 'Card tokenisation failed', {
