@@ -58,10 +58,16 @@ export function HomeScreen() {
   usePrefetchListings(!featured.isLoading);
   const pickup = usePickupStates();
   const buyDirect = useBuyDirectProducts();
-  const recent = useRecentDeals();
-  const spotlight = useSpotlightDeals();
-  const brands = useHomeBrands();
-  const articles = useHomeArticles();
+  // Delay lower-priority sections by 400ms so featured/pickup/buyDirect get bandwidth first.
+  const [secondaryEnabled, setSecondaryEnabled] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setSecondaryEnabled(true), 400);
+    return () => clearTimeout(timer);
+  }, []);
+  const recent = useRecentDeals(secondaryEnabled);
+  const spotlight = useSpotlightDeals(secondaryEnabled);
+  const brands = useHomeBrands(secondaryEnabled);
+  const articles = useHomeArticles(secondaryEnabled);
 
   // The page paints immediately and every section loads on its own, so the splash never waits on the network.
   useEffect(() => {

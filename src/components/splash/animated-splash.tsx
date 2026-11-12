@@ -13,7 +13,7 @@ import Animated, {
 
 import { SunhubLogo } from '@/components/home/sunhub-logo';
 
-const MIN_VISIBLE_MS = 1700;
+const MIN_VISIBLE_MS = 1200;
 const MAX_WAIT_MS = 6000;
 const EXIT_MS = 450;
 const RING_MS = 1900;

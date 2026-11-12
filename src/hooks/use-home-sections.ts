@@ -51,11 +51,12 @@ function useSection<T>(name: string, loader: () => Promise<T>, enabled = true): 
 }
 
 export const useFeaturedDeals = () => useSection('featured', loadFeaturedDeals);
-export const useRecentDeals = () => useSection('recent', loadRecentDeals);
-export const useSpotlightDeals = () => useSection('spotlight', loadSpotlightDeals);
+export const useRecentDeals = (enabled = true) => useSection('recent', loadRecentDeals, enabled);
+export const useSpotlightDeals = (enabled = true) =>
+  useSection('spotlight', loadSpotlightDeals, enabled);
 export const usePickupStates = () => useSection('pickup', loadPickupStates);
 export const useBuyDirectProducts = () => useSection('buy-direct', loadBuyDirectProducts);
-export const useHomeBrands = () => useSection('brands', loadBrands);
+export const useHomeBrands = (enabled = true) => useSection('brands', loadBrands, enabled);
 /** Deals for the state picked in the local pickup section. */
 export const usePickupDeals = (code: string | null): SectionState<ResultPage<HomeDeal>> =>
   useSection(
@@ -63,7 +64,7 @@ export const usePickupDeals = (code: string | null): SectionState<ResultPage<Hom
     () => searchDeals({ selection: { state: code ? [code] : [] } }, 1),
     code !== null,
   );
-export const useHomeArticles = () => useSection('articles', loadArticles);
+export const useHomeArticles = (enabled = true) => useSection('articles', loadArticles, enabled);
 
 /** Pull-to-refresh: refetches every home section at once. */
 export function useRefreshHome(): () => Promise<void> {
